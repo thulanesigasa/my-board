@@ -14,8 +14,8 @@ import {
   LogOut,
   Wifi,
   FileCode,
-  FileImage,
   FileJson,
+  Sparkles,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -76,41 +76,39 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
-      {/* Left: Brand & Room Title */}
-      <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl px-4 py-2.5 shadow-2xl flex items-center gap-3 pointer-events-auto">
-        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition">
-          <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-600/30">
+      {/* Brand & Room Title Glass Container */}
+      <div className="glass-card px-4 py-2 flex items-center gap-3 pointer-events-auto">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition group">
+          <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition">
             <LayoutGrid className="w-4 h-4" />
           </div>
-          <span className="font-extrabold text-sm tracking-tight text-white hidden sm:inline">my-board</span>
+          <span className="font-extrabold text-sm tracking-tight gradient-text hidden sm:inline">my-board</span>
         </Link>
 
-        <div className="h-4 w-px bg-slate-800" />
+        <div className="h-4 w-px bg-white/10" />
 
         <input
           type="text"
           value={roomTitle}
           onChange={(e) => setRoomTitle(e.target.value)}
           placeholder="Untitled Board"
-          className="bg-transparent font-semibold text-sm text-slate-200 focus:outline-none focus:bg-slate-800/50 px-2 py-1 rounded-lg transition border border-transparent focus:border-slate-700 w-36 sm:w-48"
+          className="bg-transparent font-bold text-sm text-slate-200 focus:outline-none focus:bg-slate-900/60 px-2.5 py-1 rounded-xl transition border border-transparent focus:border-indigo-500/40 w-36 sm:w-52"
         />
 
-        <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
-          isConnected ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-        }`}>
+        <div className={`badge ${isConnected ? 'badge-primary' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'}`}>
           <Wifi className="w-3 h-3 animate-pulse" />
-          <span className="hidden md:inline">{isConnected ? 'Live' : 'Connecting'}</span>
+          <span className="hidden md:inline font-mono">{isConnected ? 'LIVE SYNC' : 'OFFLINE'}</span>
         </div>
       </div>
 
-      {/* Right: Presences, Export, Share & Auth */}
+      {/* Right Action Glass Bar */}
       <div className="flex items-center gap-3 pointer-events-auto">
-        {/* Active Collaborators Stack */}
-        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl px-3 py-2 shadow-2xl flex items-center gap-1">
+        {/* Collaborators Stack */}
+        <div className="glass-card px-3 py-1.5 flex items-center gap-1.5">
           {presences.slice(0, 4).map((p) => (
             <div
               key={p.id}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-slate-900 shadow-md"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-extrabold ring-2 ring-slate-950 shadow-lg transition hover:scale-110"
               style={{ backgroundColor: p.color }}
               title={p.name}
             >
@@ -118,37 +116,37 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           ))}
           {presences.length > 4 && (
-            <div className="w-7 h-7 rounded-full bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center ring-2 ring-slate-900">
+            <div className="w-7 h-7 rounded-full bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center ring-2 ring-slate-950">
               +{presences.length - 4}
             </div>
           )}
         </div>
 
-        {/* Export Menu Dropdown */}
+        {/* Export Dropdown */}
         <div className="relative">
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
-            className="bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 hover:bg-slate-800 text-slate-200 p-2.5 rounded-2xl shadow-2xl transition flex items-center gap-2 text-xs font-medium"
+            className="glass-card px-3.5 py-2 hover:border-indigo-500/40 text-slate-200 font-semibold text-xs transition flex items-center gap-2"
           >
             <Download className="w-4 h-4 text-indigo-400" />
             <span className="hidden sm:inline">Export</span>
           </button>
 
           {showExportMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-1 z-50 text-xs">
+            <div className="absolute right-0 mt-2 w-52 glass-card p-1.5 z-50 text-xs shadow-2xl">
               <button
                 onClick={exportAsSVG}
-                className="w-full px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2.5 text-left transition"
+                className="w-full px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 flex items-center gap-2.5 text-left transition"
               >
                 <FileCode className="w-4 h-4 text-indigo-400" />
-                <span>Export as SVG Vector</span>
+                <span>Export SVG Vector</span>
               </button>
               <button
                 onClick={exportAsJSON}
-                className="w-full px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2.5 text-left transition"
+                className="w-full px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 flex items-center gap-2.5 text-left transition"
               >
                 <FileJson className="w-4 h-4 text-amber-400" />
-                <span>Export as JSON Backup</span>
+                <span>Export JSON Backup</span>
               </button>
             </div>
           )}
@@ -157,15 +155,15 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Share Button */}
         <button
           onClick={() => setShowShareModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-2xl shadow-lg shadow-indigo-600/30 font-semibold text-xs transition flex items-center gap-2"
+          className="btn-primary text-xs !py-2 !px-4"
         >
-          <Share2 className="w-4 h-4" />
+          <Share2 className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Share</span>
         </button>
 
-        {/* User Profile Avatar */}
+        {/* Profile */}
         {user && (
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-1.5 shadow-2xl flex items-center gap-2">
+          <div className="glass-card p-1 flex items-center gap-2">
             <div
               className="w-7 h-7 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-md"
               style={{ backgroundColor: user.avatarColor }}
@@ -180,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="Sign Out"
               className="p-1 text-slate-400 hover:text-red-400 transition rounded-lg"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
@@ -189,22 +187,28 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 pointer-events-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-2">Share Collaborative Board</h3>
+          <div className="glass-card p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-indigo-400" />
+                <span>Share Collaborative Board</span>
+              </h3>
+              <span className="section-number">ROOM LINK</span>
+            </div>
             <p className="text-xs text-slate-400 mb-6">
-              Anyone with this link can view and collaborate on this board in real time.
+              Anyone with this link can join, view, and draw live on this whiteboard in real time.
             </p>
 
-            <div className="flex gap-2 items-center bg-slate-950 p-2 rounded-xl border border-slate-800 mb-6">
+            <div className="flex gap-2 items-center bg-slate-950/90 p-2 rounded-xl border border-white/10 mb-6">
               <input
                 type="text"
                 readOnly
                 value={typeof window !== 'undefined' ? window.location.href : ''}
-                className="bg-transparent text-xs text-slate-300 w-full focus:outline-none px-2"
+                className="bg-transparent text-xs text-slate-300 w-full focus:outline-none px-2 font-mono"
               />
               <button
                 onClick={handleCopyLink}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-medium text-xs shrink-0 transition flex items-center gap-1.5"
+                className="btn-primary text-xs !py-1.5 !px-3 shrink-0"
               >
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied!' : 'Copy'}</span>
@@ -213,9 +217,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setShowShareModal(false)}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition"
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition"
             >
-              Close
+              Close Window
             </button>
           </div>
         </div>
