@@ -3,16 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  LayoutGrid,
-  Zap,
-  Users,
-  ShieldCheck,
-  MousePointer2,
-  Sparkles,
-  ArrowRight,
-  Palette,
-} from 'lucide-react';
+import { LayoutGrid } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -24,9 +15,9 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] relative overflow-hidden flex flex-col justify-between selection:bg-blue-600 selection:text-white">
-      {/* 60-30-10 Subtle Blue Glow Reflections */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-slate-300/20 rounded-full blur-[140px] pointer-events-none" />
+      {/* 60-30-10 Subtle Ambient Reflections */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-slate-200/40 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Floating Glass Navbar */}
       <header className="relative z-20 max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between">
@@ -50,19 +41,13 @@ export default function LandingPage() {
             onClick={handleLaunchInstantBoard}
             className="btn-primary text-xs !py-2.5 !px-5"
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>Launch Canvas</span>
+            Launch Canvas
           </button>
         </div>
       </header>
 
-      {/* Hero Section (60% White dominant, 30% Slate Grey text, 10% Blue accents) */}
+      {/* Hero Section */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 pt-12 pb-20 text-center flex flex-col items-center">
-        <div className="badge mb-8">
-          <Zap className="w-4 h-4 text-blue-600" />
-          <span>CONFLICT-FREE MULTIPLAYER ENGINE</span>
-        </div>
-
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight max-w-4xl text-slate-900 mb-6">
           Real-time collaborative drawing with zero merge conflicts.
         </h1>
@@ -74,10 +59,9 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md">
           <button
             onClick={handleLaunchInstantBoard}
-            className="btn-primary w-full sm:w-auto text-sm justify-center group"
+            className="btn-primary w-full sm:w-auto text-sm justify-center"
           >
-            <span>Start Blank Whiteboard</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+            Start Blank Whiteboard
           </button>
           <Link
             href="/register"
@@ -92,12 +76,9 @@ export default function LandingPage() {
           <div className="h-64 sm:h-96 rounded-2xl bg-white border border-slate-200 relative overflow-hidden flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] opacity-60" />
 
-            {/* Section Tag */}
-            <div className="absolute top-4 left-4 section-number">01 / LIVE PREVIEW</div>
-
             {/* Mock Vector Shapes & Sticky Note */}
             <div className="absolute top-14 left-16 w-40 h-40 rounded-2xl bg-amber-100 border border-amber-300 p-4 shadow-xl transform -rotate-3 text-slate-900 font-medium text-xs">
-              📌 Design Review Notes
+              Design Review Notes
               <ul className="mt-2 text-[10px] space-y-1 text-slate-700 font-mono">
                 <li>• Freehand ink smoothing</li>
                 <li>• Realtime live cursors</li>
@@ -112,7 +93,6 @@ export default function LandingPage() {
 
             {/* Mock Multi-Cursors */}
             <div className="absolute top-20 right-36 flex items-start gap-1">
-              <MousePointer2 className="w-5 h-5 text-emerald-600 fill-emerald-600 drop-shadow-md" />
               <div className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-[10px] font-bold text-white shadow-md flex items-center gap-1 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 <span>Sarah (Architect)</span>
@@ -120,7 +100,6 @@ export default function LandingPage() {
             </div>
 
             <div className="absolute bottom-12 left-44 flex items-start gap-1">
-              <MousePointer2 className="w-5 h-5 text-blue-600 fill-blue-600 drop-shadow-md" />
               <div className="px-2.5 py-0.5 rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-md flex items-center gap-1 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 <span>Alex (Designer)</span>
@@ -134,16 +113,12 @@ export default function LandingPage() {
       <section className="relative z-10 max-w-6xl mx-auto px-6 py-20 border-t border-slate-200">
         <div className="flex items-center justify-between mb-12">
           <div className="text-left">
-            <span className="section-number mb-2 inline-block">02 / CORE CAPABILITIES</span>
             <h2 className="text-3xl font-extrabold text-slate-900">Engineered for perfection</h2>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="glass-card p-8 text-left">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 border border-blue-200">
-              <Users className="w-5 h-5" />
-            </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Multi-Cursor Presence</h3>
             <p className="text-xs text-slate-600 leading-relaxed font-body">
               Track active collaborators in real time with custom user colors, avatar initials, and smooth 60 FPS cursor movement.
@@ -151,9 +126,6 @@ export default function LandingPage() {
           </div>
 
           <div className="glass-card p-8 text-left">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mb-6 border border-slate-200">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Conflict-Free LWW Engine</h3>
             <p className="text-xs text-slate-600 leading-relaxed font-body">
               Last-Write-Wins field merging guarantees multiple users can draw, move, and edit shapes simultaneously without merge conflicts.
@@ -161,9 +133,6 @@ export default function LandingPage() {
           </div>
 
           <div className="glass-card p-8 text-left">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 border border-blue-200">
-              <Palette className="w-5 h-5" />
-            </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Supabase PostgreSQL Backup</h3>
             <p className="text-xs text-slate-600 leading-relaxed font-body">
               Persist your board rooms and shapes securely to Supabase PostgreSQL database with instant snapshot hydration.
