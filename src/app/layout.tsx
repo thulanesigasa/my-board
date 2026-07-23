@@ -1,25 +1,18 @@
 import type { Metadata } from 'next';
-import { Outfit, Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
-const outfit = Outfit({
+const poppins = Poppins({
+  variable: '--font-poppins',
   subsets: ['latin'],
-  variable: '--font-outfit',
-  weight: ['300', '400', '500', '600', '700', '800'],
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'my-board • Real-Time Collaborative Whiteboard',
-  description: 'Fast, conflict-free multi-user drawing and whiteboard app powered by WebSockets & Supabase',
+  title: 'my-board - Real-time Collaborative Whiteboard',
+  description: 'Conflict-free real-time drawing, vector shapes, sticky notes, and live multi-cursor collaboration.',
 };
 
 export default function RootLayout({
@@ -28,11 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${inter.variable} dark`} suppressHydrationWarning>
-      <body className="font-sans bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    <html lang="en" className={`${poppins.variable}`}>
+      <body className="antialiased selection:bg-blue-600 selection:text-white">
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
