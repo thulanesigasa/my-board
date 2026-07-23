@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Footer } from '@/components/Footer';
+
 import { TrustStatsBar } from '@/components/landing/TrustStatsBar';
 import { InteractiveSandbox } from '@/components/landing/InteractiveSandbox';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
@@ -11,108 +11,123 @@ import { UseCaseShowcase } from '@/components/landing/UseCaseShowcase';
 import { FeatureSuperpowerMatrix } from '@/components/landing/FeatureSuperpowerMatrix';
 import { ComparisonMatrix } from '@/components/landing/ComparisonMatrix';
 import { FaqAccordion } from '@/components/landing/FaqAccordion';
+import { Footer } from '@/components/Footer';
 
-export default function LandingPage() {
+export default function Home() {
+  const [roomInput, setRoomInput] = useState('');
   const router = useRouter();
 
-  const handleLaunchInstantBoard = () => {
-    const roomId = `room_${Date.now().toString(36)}`;
-    router.push(`/board/${roomId}`);
+  const handleLaunch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetRoom = roomInput.trim() || `room-${Math.random().toString(36).substring(2, 8)}`;
+    router.push(`/board/${targetRoom}`);
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between selection:bg-blue-600 selection:text-white font-sans">
-      {/* 1. Floating Header Navbar */}
-      <header className="relative z-20 max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between">
-        <span className="text-xl font-black tracking-tight text-slate-900">
-          my-board
-        </span>
+    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] relative overflow-hidden font-sans">
+      {/* 60-30-10 Ambient Background Reflections */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-blue-600/5 blur-3xl pointer-events-none rounded-full" />
 
-        <div className="flex items-center gap-4">
-          <Link
-            href="/login"
-            className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition px-4 py-2 rounded-full hover:bg-slate-200/50"
-          >
-            Sign In
+      {/* Floating Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200/80 px-6 py-4 transition-all">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <Link href="/" className="text-xl font-extrabold tracking-tight text-slate-900 font-heading">
+            my-board
           </Link>
-          <button
-            onClick={handleLaunchInstantBoard}
-            className="btn-primary text-xs !py-2.5 !px-5"
-          >
-            Launch Canvas
-          </button>
+
+          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600 font-body">
+            <a href="#sandbox" className="hover:text-blue-600 transition">Interactive Sandbox</a>
+            <a href="#how-it-works" className="hover:text-blue-600 transition">How It Works</a>
+            <a href="#use-cases" className="hover:text-blue-600 transition">Use Cases</a>
+            <a href="#features" className="hover:text-blue-600 transition">Workbench Engine</a>
+            <a href="#faq" className="hover:text-blue-600 transition">FAQ</a>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <Link
+              href="/login"
+              className="text-xs font-bold text-slate-700 hover:text-blue-600 transition font-body"
+            >
+              Sign In
+            </Link>
+            <button onClick={handleLaunch} className="btn-primary text-xs !py-2.5 !px-5 font-heading">
+              <span>Launch Whiteboard</span>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* 2. Main Hero Section */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-12 pb-16 text-center flex flex-col items-center">
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight max-w-4xl text-slate-900 mb-6">
-          Real-time collaborative drawing with zero merge conflicts.
+      {/* 1. Main Hero Section */}
+      <section className="relative pt-20 pb-20 px-6 max-w-5xl mx-auto text-center z-10">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 text-xs font-semibold text-blue-700">
+          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+          <span>Real-time WebSocket & Supabase PostgreSQL Engine</span>
+        </div>
+
+        <h1 className="text-4xl sm:text-6xl font-black text-slate-900 leading-[1.15] mb-6 font-heading tracking-tight">
+          Collaborative Whiteboarding <br />
+          <span className="gradient-text">Built For Modern Teams</span>
         </h1>
 
-        <p className="text-slate-600 text-base sm:text-lg max-w-2xl mb-10 leading-relaxed font-body">
-          Powered by high-frequency Socket.IO presence, dual-layer ink smoothing, vector shapes, sticky notes, and Supabase PostgreSQL persistence.
+        <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-body">
+          Draw smooth Bezier pressure ink, create vector shapes, write sticky notes, and stream multi-user cursor tags in real-time with Last-Write-Wins CRDT sync.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md">
-          <button
-            onClick={handleLaunchInstantBoard}
-            className="btn-primary w-full sm:w-auto text-sm justify-center"
-          >
-            Start Blank Whiteboard
+        {/* Room Launch Form */}
+        <form onSubmit={handleLaunch} className="max-w-md mx-auto flex flex-col sm:flex-row gap-3 mb-8">
+          <input
+            type="text"
+            value={roomInput}
+            onChange={(e) => setRoomInput(e.target.value)}
+            placeholder="Enter room code or leave blank..."
+            className="flex-1 px-5 py-3.5 rounded-full bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body shadow-sm"
+          />
+          <button type="submit" className="btn-primary text-xs !py-3.5 justify-center shadow-lg font-heading">
+            <span>Start Collaborating</span>
           </button>
-          <Link
-            href="/register"
-            className="w-full sm:w-auto px-8 py-3.5 glass-card text-slate-700 font-bold rounded-full transition text-sm flex items-center justify-center hover:border-blue-500/50 hover:text-slate-900"
-          >
-            Create Free Account
-          </Link>
-        </div>
+        </form>
       </section>
 
-      {/* 3. Social Proof & Trust Metrics Bar */}
+      {/* 2. Authentic Tech Specs Bar */}
       <TrustStatsBar />
 
-      {/* 4. Live Interactive Canvas Sandbox */}
+      {/* 3. Interactive Sandbox Demo */}
       <InteractiveSandbox />
 
-      {/* 5. 3-Step "How It Works" Timeline */}
+      {/* 4. How It Works Timeline */}
       <HowItWorksSection />
 
-      {/* 6. Team Use Cases & Workflows Showcase */}
+      {/* 5. Team Use Cases Showcase */}
       <UseCaseShowcase />
 
-      {/* 7. Superpower Feature Matrix */}
+      {/* 6. Unified Canvas Workbench Board */}
       <FeatureSuperpowerMatrix />
 
-      {/* 8. Comparison Matrix (my-board vs Legacy) */}
+      {/* 7. Comparison Matrix */}
       <ComparisonMatrix />
 
-      {/* 9. Expandable FAQ Accordion */}
+      {/* 8. FAQ Accordion */}
       <FaqAccordion />
 
-      {/* 10. Bottom High-Converting CTA Banner */}
-      <section className="py-20 bg-slate-900 text-white text-center relative z-10">
-        <div className="max-w-4xl mx-auto px-6 space-y-6">
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
-            Ready to collaborate in real time?
+      {/* 9. High-Converting Bottom CTA Banner */}
+      <section className="py-20 bg-slate-900 text-white relative z-10 font-sans">
+        <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
+          <h2 className="text-3xl sm:text-5xl font-black font-heading tracking-tight">
+            Ready to Start Whiteboarding?
           </h2>
-          <p className="text-slate-400 text-sm max-w-lg mx-auto font-body">
-            Join thousands of teams drawing, diagramming, and brainstorming with zero merge conflicts.
+          <p className="text-slate-300 text-sm max-w-xl mx-auto font-body leading-relaxed">
+            Create an instant collaborative room session with zero configuration or sign in for persistent cloud whiteboard saves.
           </p>
-          <div className="pt-4">
-            <button
-              onClick={handleLaunchInstantBoard}
-              className="btn-primary text-sm !py-3.5 !px-8 shadow-2xl"
-            >
-              Launch Board Now — It's Free
+          <div>
+            <button onClick={handleLaunch} className="btn-primary text-sm !py-3.5 !px-8 shadow-2xl font-heading">
+              <span>Create Whiteboard Room Now</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* 11. Multi-Column Footer (portflio styled) */}
+      {/* 10. Portflio-Style Multi-Column Footer */}
       <Footer />
-    </div>
+    </main>
   );
 }
