@@ -36,10 +36,10 @@ export const ComparisonMatrix: React.FC = () => {
                 <tr key={i} className="hover:bg-slate-50 transition">
                   <td className="p-4 sm:p-6 font-semibold text-slate-900">{row.feature}</td>
                   <td className="p-4 sm:p-6 font-bold text-blue-600">
-                    {row.myBoard ? '✓ Included' : '—'}
+                    {row.myBoard ? 'Included' : '-'}
                   </td>
                   <td className="p-4 sm:p-6 text-slate-500 font-mono">
-                    {row.legacy ? '✓ Paid Plan' : '✗ Restricted'}
+                    {row.legacy ? 'Paid Plan' : 'Restricted'}
                   </td>
                 </tr>
               ))}

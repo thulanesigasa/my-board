@@ -10,19 +10,19 @@ export const UseCaseShowcase: React.FC = () => {
       title: 'UX/UI Brainstorming & Wireframes',
       description: 'Map out user journeys, sticky notes, and freehand pressure wireframes simultaneously with your design team.',
       highlights: ['Freehand smooth stroke ink', 'Color-coded sticky notes', 'Live multiplayer cursor tags'],
-      mockup: '🎨 UX Wireframe & Journey Map Session',
+      mockup: 'UX Wireframe & Journey Map Session',
     },
     architecture: {
       title: 'Software System Architecture & WebSockets',
       description: 'Diagram complex cloud microservices, database schemas, and Socket.IO real-time event streaming flows.',
       highlights: ['Vector Rectangles & Arrows', 'Supabase PostgreSQL persistence', 'Export SVG vector diagrams'],
-      mockup: '⚡ Microservices & Database Architecture',
+      mockup: 'Microservices & Database Architecture',
     },
     sprint: {
       title: 'Agile Sprint Planning & Retrospectives',
       description: 'Organize sprint backlogs, feature prioritization grids, and retrospective feedback cards with your agile team.',
       highlights: ['Drag & drop state sync', 'Conflict-free LWW engine', 'Unlimited room sessions'],
-      mockup: '📊 Sprint Backlog & Retrospective Board',
+      mockup: 'Sprint Backlog & Retrospective Board',
     },
   };
 
@@ -93,11 +93,11 @@ export const UseCaseShowcase: React.FC = () => {
           </div>
 
           <div className="h-64 rounded-2xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between text-white relative overflow-hidden shadow-inner">
-            <div className="text-xs font-bold font-mono text-blue-400">
+            <div className="text-xs font-bold font-mono text-blue-400 uppercase tracking-wider">
               {current.mockup}
             </div>
             <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-xs">
-              Live WebSocket Sync Active • 60 FPS Cursor Update
+              Live WebSocket Sync Active - 60 FPS Cursor Update
             </div>
           </div>
         </div>
