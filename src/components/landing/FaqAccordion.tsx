@@ -20,7 +20,7 @@ export const FaqAccordion: React.FC = () => {
     },
     {
       q: 'Can I export my whiteboards?',
-      a: 'Absolutly! You can export your visual board as scalable vector SVG graphics or download a full JSON state backup at any time.',
+      a: 'Absolutely! You can export your visual board as scalable vector SVG graphics or download a full JSON state backup at any time.',
     },
   ];
 
@@ -40,23 +40,30 @@ export const FaqAccordion: React.FC = () => {
             return (
               <div
                 key={i}
-                className="glass-card overflow-hidden transition shadow-sm"
+                className="glass-card overflow-hidden transition-all duration-300 shadow-sm"
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full p-6 text-left font-bold text-slate-900 flex items-center justify-between gap-4 text-base focus:outline-none"
+                  className="w-full p-6 text-left font-bold text-slate-900 flex items-center justify-between gap-4 text-base focus:outline-none hover:text-blue-600 transition"
                 >
                   <span>{faq.q}</span>
-                  <span className="text-blue-600 font-mono text-xl font-bold">
-                    {isOpen ? '−' : '+'}
+                  <span className={`text-blue-600 font-mono text-xl font-bold transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                    ↓
                   </span>
                 </button>
 
-                {isOpen && (
-                  <div className="px-6 pb-6 text-xs text-slate-600 leading-relaxed font-body border-t border-slate-100 pt-4">
-                    {faq.a}
+                {/* Smooth CSS Grid Slide Transition */}
+                <div
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="px-6 pb-6 text-xs text-slate-600 leading-relaxed font-body border-t border-slate-100 pt-4">
+                      {faq.a}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             );
           })}
