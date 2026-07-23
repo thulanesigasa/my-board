@@ -6,6 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
+// Load environment variables from .env.local in parent directory
+require('dotenv').config({ path: path.join(__dirname, '../.env.local') });
+
 const app = express();
 app.use(cors());
 app.use(express.json());
