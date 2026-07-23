@@ -58,15 +58,10 @@ export default function Home() {
       </header>
 
       {/* 1. Split Hero Section (Text Left, Video Right) */}
-      <section className="relative pt-12 pb-20 px-6 max-w-7xl mx-auto text-left z-10">
+      <section className="relative pt-16 pb-20 px-6 max-w-7xl mx-auto text-left z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Text & Launch Form (7 Cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-xs font-semibold text-blue-700">
-              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              <span>Real-time WebSocket & Supabase PostgreSQL Engine</span>
-            </div>
-
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.15] font-heading tracking-tight">
               Collaborative Whiteboarding <br />
               <span className="gradient-text">Built For Modern Teams</span>
