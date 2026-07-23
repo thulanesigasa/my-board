@@ -5,18 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { UserPresence, BaseShape } from '@/types/board';
-import {
-  LayoutGrid,
-  Share2,
-  Download,
-  Check,
-  Copy,
-  LogOut,
-  Wifi,
-  FileCode,
-  FileJson,
-  Sparkles,
-} from 'lucide-react';
+import { LayoutGrid, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   roomId: string;
@@ -76,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
-      {/* Brand & Room Title Glass Container */}
+      {/* Brand & Room Title */}
       <div className="glass-card px-4 py-2 flex items-center gap-3 pointer-events-auto shadow-lg">
         <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition group">
           <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-extrabold shadow-md shadow-blue-600/30 group-hover:scale-105 transition">
@@ -95,13 +84,12 @@ export const Header: React.FC<HeaderProps> = ({
           className="bg-transparent font-bold text-sm text-slate-900 focus:outline-none focus:bg-slate-100 px-2.5 py-1 rounded-xl transition border border-transparent focus:border-blue-500/40 w-36 sm:w-52"
         />
 
-        <div className={`badge ${isConnected ? 'badge-primary' : 'bg-amber-50 border-amber-200 text-amber-600'}`}>
-          <Wifi className="w-3 h-3 animate-pulse" />
-          <span className="hidden md:inline font-mono">{isConnected ? 'LIVE SYNC' : 'OFFLINE'}</span>
+        <div className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+          {isConnected ? 'LIVE' : 'OFFLINE'}
         </div>
       </div>
 
-      {/* Right Action Glass Bar */}
+      {/* Right Action Bar */}
       <div className="flex items-center gap-3 pointer-events-auto">
         {/* Collaborators Stack */}
         <div className="glass-card px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
@@ -126,27 +114,24 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
-            className="glass-card px-3.5 py-2 hover:border-blue-500/40 text-slate-700 font-semibold text-xs transition flex items-center gap-2 shadow-lg"
+            className="glass-card px-3.5 py-2 hover:border-blue-500/40 text-slate-700 font-semibold text-xs transition shadow-lg"
           >
-            <Download className="w-4 h-4 text-blue-600" />
-            <span className="hidden sm:inline">Export</span>
+            Export
           </button>
 
           {showExportMenu && (
-            <div className="absolute right-0 mt-2 w-52 glass-card p-1.5 z-50 text-xs shadow-2xl">
+            <div className="absolute right-0 mt-2 w-48 glass-card p-1.5 z-50 text-xs shadow-2xl">
               <button
                 onClick={exportAsSVG}
-                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-2.5 text-left transition"
+                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-left transition font-semibold"
               >
-                <FileCode className="w-4 h-4 text-blue-600" />
-                <span>Export SVG Vector</span>
+                Export SVG Vector
               </button>
               <button
                 onClick={exportAsJSON}
-                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-2.5 text-left transition"
+                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-left transition font-semibold"
               >
-                <FileJson className="w-4 h-4 text-amber-600" />
-                <span>Export JSON Backup</span>
+                Export JSON Backup
               </button>
             </div>
           )}
@@ -157,8 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setShowShareModal(true)}
           className="btn-primary text-xs !py-2 !px-4"
         >
-          <Share2 className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Share</span>
+          Share
         </button>
 
         {/* Profile */}
@@ -187,14 +171,8 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4 pointer-events-auto">
-          <div className="glass-card p-6 max-w-md w-full shadow-2xl">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <span>Share Collaborative Board</span>
-              </h3>
-              <span className="section-number">ROOM LINK</span>
-            </div>
+          <div className="glass-card p-6 max-w-md w-full shadow-2xl text-left">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Share Collaborative Board</h3>
             <p className="text-xs text-slate-600 mb-6 font-body">
               Anyone with this link can join, view, and draw live on this whiteboard in real time.
             </p>
@@ -210,8 +188,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={handleCopyLink}
                 className="btn-primary text-xs !py-1.5 !px-3 shrink-0"
               >
-                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied!' : 'Copy'}</span>
+                {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
 
