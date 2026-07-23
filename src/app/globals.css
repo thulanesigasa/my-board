@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
-/* ─── 60-30-10 COLOR SCHEME DESIGN SYSTEM ─────────────────────────
+/* ─── 60-30-10 COLOR SCHEME & POPPINS / CALIBRI TYPOGRAPHY SYSTEM ────
    60% Dominant : Crisp White & Off-White (#FFFFFF / #F8FAFC)
    30% Secondary: Slate Grey & Cool Charcoal (#0F172A / #334155 / #E2E8F0)
    10% Accent   : Electric Vibrant Blue (#2563EB / #3B82F6)
+   Typography   : Poppins Bold, Poppins, & Calibri
    ───────────────────────────────────────────────────────────── */
 
 :root {
@@ -26,8 +27,9 @@
   --color-primary-glow: rgba(37, 99, 235, 0.2);
   --color-primary-dim: rgba(37, 99, 235, 0.08);
 
-  --font-heading: var(--font-outfit), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
+  /* Typography: Poppins Bold, Poppins & Calibri */
+  --font-heading: var(--font-poppins), 'Poppins', sans-serif;
+  --font-body: var(--font-poppins), 'Poppins', Calibri, sans-serif;
 
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -52,6 +54,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -91,34 +94,6 @@ h1, h2, h3, h4, h5, h6 {
   background: #1d4ed8;
   box-shadow: 0 0 36px var(--color-primary-glow);
   transform: translateY(-2px);
-}
-
-/* 30% Slate Section Header Pill */
-.section-number {
-  font-family: var(--font-heading);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  letter-spacing: 0.12em;
-  background: var(--color-primary-dim);
-  padding: 0.35rem 0.9rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-primary-glow);
-  text-transform: uppercase;
-}
-
-/* 10% Blue Badge Pill */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 1rem;
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: var(--color-primary-dim);
-  border: 1px solid var(--color-primary-glow);
-  color: var(--color-primary);
 }
 
 /* Typography Gradient & Glow */
