@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { UserPresence, BaseShape } from '@/types/board';
-import { LayoutGrid, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface HeaderProps {
   roomId: string;
@@ -67,11 +67,8 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="fixed top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
       {/* Brand & Room Title */}
       <div className="glass-card px-4 py-2 flex items-center gap-3 pointer-events-auto shadow-lg">
-        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition group">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-extrabold shadow-md shadow-blue-600/30 group-hover:scale-105 transition">
-            <LayoutGrid className="w-4 h-4" />
-          </div>
-          <span className="font-extrabold text-sm tracking-tight text-slate-900 hidden sm:inline">my-board</span>
+        <Link href="/dashboard" className="font-black text-sm tracking-tight text-slate-900 hover:text-blue-600 transition">
+          my-board
         </Link>
 
         <div className="h-4 w-px bg-slate-200" />
