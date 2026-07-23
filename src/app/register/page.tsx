@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutGrid } from 'lucide-react';
 
 export default function RegisterPage() {
   const { signUp } = useAuth();
@@ -39,9 +38,9 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 text-white mb-4 shadow-lg shadow-blue-600/30">
-            <LayoutGrid className="w-7 h-7" />
-          </div>
+          <span className="text-2xl font-black tracking-tight text-slate-900 block mb-2">
+            my-board
+          </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
             Create your account
           </h1>
