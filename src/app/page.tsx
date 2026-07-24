@@ -11,6 +11,7 @@ import { UseCaseShowcase } from '@/components/landing/UseCaseShowcase';
 import { FeatureSuperpowerMatrix } from '@/components/landing/FeatureSuperpowerMatrix';
 import { ComparisonMatrix } from '@/components/landing/ComparisonMatrix';
 import { FaqAccordion } from '@/components/landing/FaqAccordion';
+import { TransparentHeroVideo } from '@/components/landing/TransparentHeroVideo';
 import { Footer } from '@/components/Footer';
 
 export default function Home() {
@@ -57,7 +58,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 1. Split Hero Section (Frameless Video Right) */}
+      {/* 1. Split Hero Section (Frameless Transparent Keyed Video) */}
       <section className="relative pt-16 pb-20 px-6 max-w-7xl mx-auto text-left z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Text & Launch Form (7 Cols) */}
@@ -86,16 +87,9 @@ export default function Home() {
             </form>
           </div>
 
-          {/* Right Column: Frameless Video (5 Cols, No Container Box) */}
+          {/* Right Column: Transparent Keyed Video Output (5 Cols) */}
           <div className="lg:col-span-5 relative flex items-center justify-center">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              src="/vid/hero.mp4"
-              className="w-full h-auto mix-blend-multiply bg-transparent pointer-events-none object-cover"
-            />
+            <TransparentHeroVideo src="/vid/hero.mp4" />
           </div>
         </div>
       </section>
