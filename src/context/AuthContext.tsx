@@ -3,11 +3,20 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured, UserProfile, getRandomAvatarColor } from '@/lib/supabase/client';
 
+export interface SignUpProfileData {
+  firstName: string;
+  surname: string;
+  age: string;
+  career: string;
+  country: string;
+  town: string;
+}
+
 interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error?: string }>;
+  signUp: (email: string, password: string, profileData: SignUpProfileData) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   demoLogin: (name?: string) => void;
 }
@@ -26,11 +35,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user) {
+            const meta = session.user.user_metadata || {};
             setUser({
               id: session.user.id,
               email: session.user.email || '',
-              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-              avatarColor: session.user.user_metadata?.avatarColor || getRandomAvatarColor(session.user.id),
+              name: meta.name || `${meta.firstName || ''} ${meta.surname || ''}`.trim() || session.user.email?.split('@')[0] || 'User',
+              avatarColor: meta.avatarColor || getRandomAvatarColor(session.user.id),
+              firstName: meta.firstName,
+              surname: meta.surname,
+              age: meta.age,
+              career: meta.career,
+              country: meta.country,
+              town: meta.town,
             });
           }
         } catch (err) {
@@ -39,11 +55,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
           if (session?.user) {
+            const meta = session.user.user_metadata || {};
             setUser({
               id: session.user.id,
               email: session.user.email || '',
-              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-              avatarColor: session.user.user_metadata?.avatarColor || getRandomAvatarColor(session.user.id),
+              name: meta.name || `${meta.firstName || ''} ${meta.surname || ''}`.trim() || session.user.email?.split('@')[0] || 'User',
+              avatarColor: meta.avatarColor || getRandomAvatarColor(session.user.id),
+              firstName: meta.firstName,
+              surname: meta.surname,
+              age: meta.age,
+              career: meta.career,
+              country: meta.country,
+              town: meta.town,
             });
           } else {
             setUser(null);
@@ -53,7 +76,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false);
         return () => subscription.unsubscribe();
       } else {
-        // Fallback to localStorage stored session for local development
         const savedUser = localStorage.getItem(LOCAL_USER_KEY);
         if (savedUser) {
           try {
@@ -74,16 +96,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: error.message };
       if (data.user) {
+        const meta = data.user.user_metadata || {};
         setUser({
           id: data.user.id,
           email: data.user.email || '',
-          name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User',
-          avatarColor: data.user.user_metadata?.avatarColor || getRandomAvatarColor(data.user.id),
+          name: meta.name || `${meta.firstName || ''} ${meta.surname || ''}`.trim() || data.user.email?.split('@')[0] || 'User',
+          avatarColor: meta.avatarColor || getRandomAvatarColor(data.user.id),
+          firstName: meta.firstName,
+          surname: meta.surname,
+          age: meta.age,
+          career: meta.career,
+          country: meta.country,
+          town: meta.town,
         });
       }
       return {};
     } else {
-      // Local fallback auth
       const mockUser: UserProfile = {
         id: `usr_${Date.now()}`,
         email,
@@ -96,14 +124,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, profileData: SignUpProfileData) => {
     const avatarColor = getRandomAvatarColor(email);
+    const fullName = `${profileData.firstName} ${profileData.surname}`.trim();
+
     if (isSupabaseConfigured()) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name, avatarColor },
+          data: {
+            name: fullName,
+            avatarColor,
+            firstName: profileData.firstName,
+            surname: profileData.surname,
+            age: profileData.age,
+            career: profileData.career,
+            country: profileData.country,
+            town: profileData.town,
+          },
         },
       });
       if (error) return { error: error.message };
@@ -111,8 +150,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser({
           id: data.user.id,
           email: data.user.email || '',
-          name,
+          name: fullName,
           avatarColor,
+          ...profileData,
         });
       }
       return {};
@@ -120,8 +160,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const mockUser: UserProfile = {
         id: `usr_${Date.now()}`,
         email,
-        name,
+        name: fullName,
         avatarColor,
+        ...profileData,
       };
       setUser(mockUser);
       localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(mockUser));
