@@ -29,24 +29,37 @@ export const TransparentHeroVideo: React.FC<TransparentHeroVideoProps> = ({ src 
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = frame.data;
-          const len = data.length;
+          const w = canvas.width;
+          const h = canvas.height;
+          const cx = w / 2;
+          const cy = h / 2;
 
-          for (let i = 0; i < len; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              const i = (y * w + x) * 4;
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
 
-            // Average brightness of paper background pixel
-            const avg = (r + g + b) / 3;
+              // Average brightness of paper background pixel
+              const avg = (r + g + b) / 3;
 
-            // Key out grey paper background texture
-            if (avg > 185) {
-              // Completely transparent for bright paper background
-              data[i + 3] = 0;
-            } else if (avg > 150) {
-              // Smooth anti-aliased edge falloff for pen strokes
-              const alphaFactor = (185 - avg) / 35;
-              data[i + 3] = Math.floor(255 * alphaFactor);
+              // Base Alpha calculation from pixel brightness
+              let alpha = 255;
+              if (avg > 185) {
+                alpha = 0;
+              } else if (avg > 150) {
+                const alphaFactor = (185 - avg) / 35;
+                alpha = Math.floor(255 * alphaFactor);
+              }
+
+              // Calculate 4-way distance factor from center for edge vignetting (0 to 1)
+              const nx = Math.abs(x - cx) / cx;
+              const ny = Math.abs(y - cy) / cy;
+              const edgeDist = Math.max(Math.pow(nx, 3), Math.pow(ny, 3));
+              const edgeAlphaFactor = Math.max(0, 1 - edgeDist);
+
+              data[i + 3] = Math.floor(alpha * edgeAlphaFactor);
             }
           }
 
@@ -77,9 +90,13 @@ export const TransparentHeroVideo: React.FC<TransparentHeroVideoProps> = ({ src 
         className="hidden"
       />
 
-      {/* Real-time Transparent Keyed Canvas Output */}
+      {/* Real-time Feathered Transparent Canvas Output */}
       <canvas
         ref={canvasRef}
+        style={{
+          maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 95%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 95%)',
+        }}
         className="w-full h-auto object-cover pointer-events-none drop-shadow-md"
       />
     </div>
