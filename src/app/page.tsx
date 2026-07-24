@@ -57,7 +57,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 1. Split Hero Section (Text Left, Video Right) */}
+      {/* 1. Split Hero Section (Frameless Video Right) */}
       <section className="relative pt-16 pb-20 px-6 max-w-7xl mx-auto text-left z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Text & Launch Form (7 Cols) */}
@@ -86,18 +86,16 @@ export default function Home() {
             </form>
           </div>
 
-          {/* Right Column: Hero Video Frame (5 Cols) */}
-          <div className="lg:col-span-5 relative">
-            <div className="glass-card p-3 shadow-2xl relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-white/60">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                src="/vid/hero.mp4"
-                className="w-full h-auto rounded-2xl mix-blend-multiply object-cover shadow-inner"
-              />
-            </div>
+          {/* Right Column: Frameless Video (5 Cols, No Container Box) */}
+          <div className="lg:col-span-5 relative flex items-center justify-center">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              src="/vid/hero.mp4"
+              className="w-full h-auto mix-blend-multiply bg-transparent pointer-events-none object-cover"
+            />
           </div>
         </div>
       </section>
