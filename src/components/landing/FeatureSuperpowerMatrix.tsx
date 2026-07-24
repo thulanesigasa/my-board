@@ -14,7 +14,7 @@ export const FeatureSuperpowerMatrix: React.FC = () => {
           Unified Interactive Canvas Workbench
         </h2>
         <p className="text-slate-600 text-sm max-w-xl mx-auto mb-12 leading-relaxed font-body">
-          Explore all whiteboard capabilities integrated into a single unified interactive canvas workspace.
+          Explore all whiteboard capabilities integrated into a single unified 120Hz high-refresh rate canvas workspace.
         </p>
 
         {/* Single Unified Canvas Board */}
@@ -26,12 +26,12 @@ export const FeatureSuperpowerMatrix: React.FC = () => {
                 my-board // CANVAS WORKBENCH
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold font-mono border border-blue-200">
-                ACTIVE ENGINE
+                120Hz ENGINE
               </span>
             </div>
 
             <div className="flex items-center gap-4 text-xs font-mono text-slate-600">
-              <span>Sync: <strong className="text-blue-600">60 FPS</strong></span>
+              <span>Sync: <strong className="text-blue-600">120Hz High-Refresh</strong></span>
               <span>DB: <strong className="text-emerald-600">Supabase RLS</strong></span>
             </div>
           </div>
@@ -54,11 +54,11 @@ export const FeatureSuperpowerMatrix: React.FC = () => {
               <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 01 // FREEHAND INK
+                    NODE 01 // 120Hz INK ENGINE
                   </span>
                   <span className="text-[10px] font-mono text-slate-500">{strokeWidth}px</span>
                 </div>
-                <p className="text-xs font-bold text-slate-900">Bezier Stroke Generator</p>
+                <p className="text-xs font-bold text-slate-900">120Hz Bezier Pressure Generator</p>
                 <input
                   type="range"
                   min={2}
@@ -138,7 +138,7 @@ export const FeatureSuperpowerMatrix: React.FC = () => {
                 <div className="bg-slate-900 p-3 rounded-xl flex items-center justify-center">
                   <div className="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold font-mono flex items-center gap-2 shadow-md">
                     <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                    <span>Sarah (Collaborator)</span>
+                    <span>Sarah (Live 120Hz Stream)</span>
                   </div>
                 </div>
               </div>

@@ -9,7 +9,7 @@ export const UseCaseShowcase: React.FC = () => {
     brainstorm: {
       title: 'UX/UI Brainstorming & Wireframes',
       description: 'Map out user journeys, sticky notes, and freehand pressure wireframes simultaneously with your design team.',
-      highlights: ['Freehand smooth stroke ink', 'Color-coded sticky notes', 'Live multiplayer cursor tags'],
+      highlights: ['120Hz freehand smooth stroke ink', 'Color-coded sticky notes', 'Live multiplayer cursor tags'],
       mockup: 'UX Wireframe & Journey Map Session',
     },
     architecture: {
@@ -29,9 +29,9 @@ export const UseCaseShowcase: React.FC = () => {
   const current = useCases[activeTab];
 
   return (
-    <section id="use-cases" className="py-20 bg-[var(--color-bg)] relative z-10 border-b border-slate-200">
+    <section id="use-cases" className="py-20 bg-[var(--color-bg)] relative z-10 border-b border-slate-200 font-sans">
       <div className="max-w-6xl mx-auto px-6 text-center">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 font-heading">
           Built For Modern Team Workflows
         </h2>
         <p className="text-slate-600 text-sm max-w-xl mx-auto mb-10 leading-relaxed font-body">
@@ -75,7 +75,7 @@ export const UseCaseShowcase: React.FC = () => {
         {/* Display Card */}
         <div className="glass-card p-8 text-left shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
           <div className="space-y-4">
-            <h3 className="text-2xl font-extrabold text-slate-900">
+            <h3 className="text-2xl font-extrabold text-slate-900 font-heading">
               {current.title}
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed font-body">
@@ -84,7 +84,7 @@ export const UseCaseShowcase: React.FC = () => {
 
             <div className="pt-2 space-y-2">
               {current.highlights.map((h, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                <div key={i} className="flex items-center gap-2 text-xs font-semibold text-slate-800 font-body">
                   <span className="w-2 h-2 rounded-full bg-blue-600" />
                   <span>{h}</span>
                 </div>
@@ -97,7 +97,7 @@ export const UseCaseShowcase: React.FC = () => {
               {current.mockup}
             </div>
             <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-xs">
-              Live WebSocket Sync Active - 60 FPS Cursor Update
+              Live WebSocket Sync Active - 120Hz High-Refresh Cursor Stream
             </div>
           </div>
         </div>
