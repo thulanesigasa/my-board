@@ -5,8 +5,8 @@ import React from 'react';
 export const TrustStatsBar: React.FC = () => {
   const specs = [
     { title: 'Socket.IO WebSockets', detail: 'Real-time CRDT Sync Engine' },
+    { title: '120Hz Refresh Rate', detail: 'High-Frequency Canvas Engine' },
     { title: 'Supabase PostgreSQL', detail: 'Row Level Security Persistence' },
-    { title: 'HTML5 + Bezier Ink', detail: 'Dual-Layer Drawing Renderer' },
     { title: 'Vector SVG & JSON', detail: 'Instant Export Formats' },
   ];
 
