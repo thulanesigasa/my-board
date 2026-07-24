@@ -24,6 +24,12 @@ export interface UserProfile {
   email: string;
   name: string;
   avatarColor: string;
+  firstName?: string;
+  surname?: string;
+  age?: string;
+  career?: string;
+  country?: string;
+  town?: string;
 }
 
 const AVATAR_COLORS = [
