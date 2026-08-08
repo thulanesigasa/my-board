@@ -184,21 +184,21 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
   }, []);
 
   // Undo / Redo
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
       const prevShapes = history[historyIndex - 1];
       setShapes(prevShapes);
       setHistoryIndex((i) => i - 1);
     }
-  };
+  }, [history, historyIndex]);
 
-  const handleRedo = () => {
+  const handleRedo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const nextShapes = history[historyIndex + 1];
       setShapes(nextShapes);
       setHistoryIndex((i) => i + 1);
     }
-  };
+  }, [history, historyIndex]);
 
   return (
     <main className="w-full h-screen relative overflow-hidden bg-white">
@@ -216,6 +216,8 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
         onAddShape={handleAddShape}
         onUpdateShape={handleUpdateShape}
         onDeleteShape={handleDeleteShape}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
         activeTool={activeTool}
         strokeColor={strokeColor}
         fillColor={fillColor}

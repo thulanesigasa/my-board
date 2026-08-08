@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { UserPresence, BaseShape } from '@/types/board';
-import { LogOut } from 'lucide-react';
+import { Wifi, WifiOff, Download, Share2, ArrowLeft } from 'lucide-react';
+import { exportToSvg, exportToJson } from '@/lib/drawing';
 
 interface HeaderProps {
   roomId: string;
@@ -24,180 +23,115 @@ export const Header: React.FC<HeaderProps> = ({
   shapes,
   isConnected,
 }) => {
-  const { user, signOut } = useAuth();
-  const router = useRouter();
-
   const [copied, setCopied] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [showExportMenu, setShowExportMenu] = useState(false);
 
-  const handleCopyLink = () => {
+  const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const exportAsJSON = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(shapes, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `${roomTitle.toLowerCase().replace(/\s+/g, '_')}_board.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    setShowExportMenu(false);
+  const handleExportSvg = () => {
+    exportToSvg(shapes, `${roomTitle.toLowerCase().replace(/\s+/g, '-')}-board.svg`);
   };
 
-  const exportAsSVG = () => {
-    const svgEl = document.querySelector('svg');
-    if (!svgEl) return;
-    const svgData = new XMLSerializer().serializeToString(svgEl);
-    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', url);
-    downloadAnchor.setAttribute('download', `${roomTitle.toLowerCase().replace(/\s+/g, '_')}_board.svg`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    setShowExportMenu(false);
+  const handleExportJson = () => {
+    exportToJson(shapes, `${roomTitle.toLowerCase().replace(/\s+/g, '-')}-state.json`);
   };
 
   return (
-    <header className="fixed top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
-      {/* Brand & Room Title */}
-      <div className="glass-card px-4 py-2 flex items-center gap-3 pointer-events-auto shadow-lg">
-        <Link href="/dashboard" className="font-black text-sm tracking-tight text-slate-900 hover:text-blue-600 transition">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm px-6 py-3 flex items-center justify-between pointer-events-auto font-sans">
+      {/* Left Title & Navigation */}
+      <div className="flex items-center gap-4">
+        <Link
+          href="/"
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition"
+          title="Return to Home"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+
+        <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+
+        <Link href="/dashboard" className="font-black text-sm tracking-tight text-slate-900 hover:text-orange-500 transition font-heading">
           my-board
         </Link>
 
-        <div className="h-4 w-px bg-slate-200" />
-
-        <input
-          type="text"
-          value={roomTitle}
-          onChange={(e) => setRoomTitle(e.target.value)}
-          placeholder="Untitled Board"
-          className="bg-transparent font-bold text-sm text-slate-900 focus:outline-none focus:bg-slate-100 px-2.5 py-1 rounded-xl transition border border-transparent focus:border-blue-500/40 w-36 sm:w-52"
-        />
-
-        <div className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-          {isConnected ? 'LIVE' : 'OFFLINE'}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={roomTitle}
+            onChange={(e) => setRoomTitle(e.target.value)}
+            placeholder="Room Title..."
+            className="bg-transparent font-bold text-sm text-slate-900 focus:outline-none focus:bg-slate-100 px-2.5 py-1 rounded-xl transition border border-transparent focus:border-orange-500/40 w-36 sm:w-52 font-heading"
+          />
+          <div className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200">
+            {roomId}
+          </div>
         </div>
       </div>
 
-      {/* Right Action Bar */}
-      <div className="flex items-center gap-3 pointer-events-auto">
-        {/* Collaborators Stack */}
-        <div className="glass-card px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
-          {presences.slice(0, 4).map((p) => (
+      {/* Center Multiplayer Presence Avatars */}
+      <div className="hidden lg:flex items-center gap-2">
+        <div className="flex -space-x-2 overflow-hidden">
+          {presences.slice(0, 5).map((p) => (
             <div
               key={p.id}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-extrabold ring-2 ring-white shadow-md transition hover:scale-110"
+              className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center font-extrabold text-[11px] text-white shadow-sm font-heading"
               style={{ backgroundColor: p.color }}
               title={p.name}
             >
               {p.name.charAt(0).toUpperCase()}
             </div>
           ))}
-          {presences.length > 4 && (
-            <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center ring-2 ring-white">
-              +{presences.length - 4}
-            </div>
-          )}
         </div>
-
-        {/* Export Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setShowExportMenu(!showExportMenu)}
-            className="glass-card px-3.5 py-2 hover:border-blue-500/40 text-slate-700 font-semibold text-xs transition shadow-lg"
-          >
-            Export
-          </button>
-
-          {showExportMenu && (
-            <div className="absolute right-0 mt-2 w-48 glass-card p-1.5 z-50 text-xs shadow-2xl">
-              <button
-                onClick={exportAsSVG}
-                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-left transition font-semibold"
-              >
-                Export SVG Vector
-              </button>
-              <button
-                onClick={exportAsJSON}
-                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-left transition font-semibold"
-              >
-                Export JSON Backup
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Share Button */}
-        <button
-          onClick={() => setShowShareModal(true)}
-          className="btn-primary text-xs !py-2 !px-4"
-        >
-          Share
-        </button>
-
-        {/* Profile */}
-        {user && (
-          <div className="glass-card p-1 flex items-center gap-2 shadow-lg">
-            <div
-              className="w-7 h-7 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm"
-              style={{ backgroundColor: user.avatarColor }}
-            >
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <button
-              onClick={async () => {
-                await signOut();
-                router.push('/login');
-              }}
-              title="Sign Out"
-              className="p-1 text-slate-400 hover:text-red-600 transition rounded-lg"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        {presences.length > 5 && (
+          <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+            +{presences.length - 5}
+          </span>
         )}
       </div>
 
-      {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4 pointer-events-auto">
-          <div className="glass-card p-6 max-w-md w-full shadow-2xl text-left">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Share Collaborative Board</h3>
-            <p className="text-xs text-slate-600 mb-6 font-body">
-              Anyone with this link can join, view, and draw live on this whiteboard in real time.
-            </p>
-
-            <div className="flex gap-2 items-center bg-slate-50 p-2 rounded-xl border border-slate-200 mb-6">
-              <input
-                type="text"
-                readOnly
-                value={typeof window !== 'undefined' ? window.location.href : ''}
-                className="bg-transparent text-xs text-slate-700 w-full focus:outline-none px-2 font-mono"
-              />
-              <button
-                onClick={handleCopyLink}
-                className="btn-primary text-xs !py-1.5 !px-3 shrink-0"
-              >
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-
-            <button
-              onClick={() => setShowShareModal(false)}
-              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition"
-            >
-              Close Window
-            </button>
-          </div>
+      {/* Right Actions & Export Controls */}
+      <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono">
+          {isConnected ? (
+            <>
+              <Wifi className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+              <span className="text-slate-700 font-bold hidden sm:inline">120Hz Sync</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="w-3.5 h-3.5 text-red-500" />
+              <span className="text-slate-500 hidden sm:inline">Disconnected</span>
+            </>
+          )}
         </div>
-      )}
+
+        <button
+          onClick={handleExportSvg}
+          className="glass-card px-3.5 py-2 hover:border-orange-500/40 text-slate-700 font-semibold text-xs transition shadow-sm flex items-center gap-1.5 font-body"
+        >
+          <Download className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">SVG Export</span>
+        </button>
+
+        <button
+          onClick={handleExportJson}
+          className="glass-card px-3.5 py-2 hover:border-orange-500/40 text-slate-700 font-semibold text-xs transition shadow-sm hidden md:flex items-center gap-1.5 font-body"
+        >
+          <Download className="w-3.5 h-3.5" />
+          <span>JSON</span>
+        </button>
+
+        <button
+          onClick={handleShare}
+          className="btn-primary text-xs !py-2 !px-4 shadow-md font-heading"
+        >
+          <Share2 className="w-3.5 h-3.5" />
+          <span>{copied ? 'Copied Link!' : 'Share Room'}</span>
+        </button>
+      </div>
     </header>
   );
 };

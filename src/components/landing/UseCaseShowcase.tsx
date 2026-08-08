@@ -50,7 +50,7 @@ export const UseCaseShowcase: React.FC = () => {
             onClick={() => setActiveTab('brainstorm')}
             className={`px-5 py-2.5 rounded-full text-xs font-bold transition ${
               activeTab === 'brainstorm'
-                ? 'bg-blue-600 text-white shadow'
+                ? 'bg-orange-500 text-white shadow'
                 : 'glass-card text-slate-700 hover:border-slate-300'
             }`}
           >
@@ -60,7 +60,7 @@ export const UseCaseShowcase: React.FC = () => {
             onClick={() => setActiveTab('architecture')}
             className={`px-5 py-2.5 rounded-full text-xs font-bold transition ${
               activeTab === 'architecture'
-                ? 'bg-blue-600 text-white shadow'
+                ? 'bg-orange-500 text-white shadow'
                 : 'glass-card text-slate-700 hover:border-slate-300'
             }`}
           >
@@ -70,7 +70,7 @@ export const UseCaseShowcase: React.FC = () => {
             onClick={() => setActiveTab('sprint')}
             className={`px-5 py-2.5 rounded-full text-xs font-bold transition ${
               activeTab === 'sprint'
-                ? 'bg-blue-600 text-white shadow'
+                ? 'bg-orange-500 text-white shadow'
                 : 'glass-card text-slate-700 hover:border-slate-300'
             }`}
           >
@@ -86,7 +86,7 @@ export const UseCaseShowcase: React.FC = () => {
           </div>
 
           <div className="space-y-4 relative z-10">
-            <p className="text-xs font-bold tracking-widest text-blue-600 uppercase font-mono">
+            <p className="text-xs font-bold tracking-widest text-orange-500 uppercase font-mono">
               {current.stepTag}
             </p>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-heading">
@@ -99,7 +99,7 @@ export const UseCaseShowcase: React.FC = () => {
             <div className="pt-2 space-y-2.5">
               {current.highlights.map((h, i) => (
                 <div key={i} className="flex items-center gap-2.5 text-xs font-semibold text-slate-800 font-body">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+                  <span className="w-2 h-2 rounded-full bg-orange-500" />
                   <span>{h}</span>
                 </div>
               ))}
@@ -107,7 +107,7 @@ export const UseCaseShowcase: React.FC = () => {
           </div>
 
           <div className="h-64 rounded-2xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between text-white relative z-10 overflow-hidden shadow-inner">
-            <div className="text-xs font-bold font-mono text-blue-400 uppercase tracking-wider">
+            <div className="text-xs font-bold font-mono text-orange-400 uppercase tracking-wider">
               {current.mockup}
             </div>
             <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-xs">

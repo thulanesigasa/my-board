@@ -6,122 +6,107 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
-  const { signIn, demoLogin } = useAuth();
-  const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const { signIn } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const res = await signIn(email, password);
-    setLoading(false);
-
-    if (res.error) {
-      setError(res.error);
-    } else {
-      router.push('/dashboard');
+    try {
+      const res = await signIn(email, password);
+      if (res?.error) {
+        setError(typeof res.error === 'string' ? res.error : 'Invalid email or password credentials.');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch {
+      setError('An unexpected sign-in error occurred.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDemo = () => {
-    demoLogin('Demo Collaborator');
-    router.push('/dashboard');
-  };
-
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* 60-30-10 Ambient Reflections */}
-      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-slate-300/20 rounded-full blur-3xl pointer-events-none" />
+    <main className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center p-6 relative overflow-hidden font-sans">
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <span className="text-2xl font-black tracking-tight text-slate-900 block mb-2">
+      <div className="w-full max-w-md glass-card p-8 sm:p-10 shadow-2xl relative z-10 space-y-8 border border-slate-200">
+        <div className="text-center space-y-2">
+          <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 font-heading inline-block">
             my-board
-          </span>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-            Welcome back to my-board
-          </h1>
-          <p className="text-slate-600 text-sm mt-2">
-            Sign in to access your collaborative whiteboards & canvases
+          </Link>
+          <h1 className="text-xl font-bold text-slate-900 font-heading">Welcome Back</h1>
+          <p className="text-xs text-slate-600 font-body">
+            Sign in to access your saved collaborative whiteboard rooms
           </p>
         </div>
 
-        {/* Glassmorphism Card */}
-        <div className="glass-card p-8 shadow-2xl">
-          {error && (
-            <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold font-body">
+            {error}
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-5 text-left">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="artist@myboard.dev"
-                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 font-body transition"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+            />
+          </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
                 Password
               </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 font-body transition"
-              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-[11px] font-semibold text-orange-500 hover:underline font-body"
+              >
+                {showPassword ? 'Hide' : 'View'}
+              </button>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center !py-3.5"
-            >
-              <span>{loading ? 'Signing in...' : 'Sign In'}</span>
-            </button>
-          </form>
-
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <span className="relative px-3 bg-white text-xs text-slate-500 font-mono uppercase tracking-wider">
-              Or Instant Access
-            </span>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+            />
           </div>
 
           <button
-            onClick={handleDemo}
-            type="button"
-            className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl border border-slate-300 transition text-sm"
+            type="submit"
+            disabled={loading}
+            className="w-full btn-primary justify-center !py-3.5 shadow-lg text-xs font-heading"
           >
-            Continue as Demo Guest
+            {loading ? 'Signing In...' : 'Sign In To Dashboard'}
           </button>
+        </form>
 
-          <p className="text-center text-xs text-slate-600 mt-6">
-            Don't have an account?{' '}
-            <Link href="/register" className="text-blue-600 hover:text-blue-700 font-semibold underline underline-offset-4">
-              Register now
-            </Link>
-          </p>
+        <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-600 font-body">
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="font-bold text-orange-500 hover:underline font-heading">
+            Create Free Account
+          </Link>
         </div>
       </div>
     </main>

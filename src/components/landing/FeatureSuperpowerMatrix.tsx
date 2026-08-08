@@ -3,174 +3,168 @@
 import React, { useState } from 'react';
 
 export const FeatureSuperpowerMatrix: React.FC = () => {
-  const [activeColor, setActiveColor] = useState('#2563EB');
   const [strokeWidth, setStrokeWidth] = useState(6);
-  const [crdtCount, setCrdtCount] = useState(1);
+  const [crdtCount, setCrdtCount] = useState(14);
+  const [activeColor, setActiveColor] = useState('#F97316');
 
   return (
-    <section id="features" className="py-20 bg-white relative z-10 border-b border-slate-200 font-sans">
+    <section id="features" className="py-20 bg-[var(--color-bg)] relative z-10 border-b border-slate-200 font-sans">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 font-heading">
-          Unified Interactive Canvas Workbench
+          Unified Canvas Workbench Engine
         </h2>
-        <p className="text-slate-600 text-sm max-w-xl mx-auto mb-12 leading-relaxed font-body">
-          Explore all whiteboard capabilities integrated into a single unified 120Hz high-refresh rate canvas workspace.
+        <p className="text-slate-600 text-sm max-w-xl mx-auto mb-16 leading-relaxed font-body">
+          State-of-the-art vector engine designed for zero input lag and real-time multiplayer editing.
         </p>
 
-        {/* Single Unified Canvas Board */}
-        <div className="glass-card p-6 shadow-2xl relative overflow-hidden max-w-5xl mx-auto text-left border-2 border-slate-200">
-          {/* Top Workbench Status Bar */}
-          <div className="flex flex-wrap items-center justify-between pb-4 mb-6 border-b border-slate-200 gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-black text-slate-900 font-heading">
-                my-board // CANVAS WORKBENCH
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+          {/* Card 1 */}
+          <div className="glass-card p-6 space-y-4 hover:border-orange-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 font-heading">
+                Bezier Smooth Freehand Ink
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold font-mono border border-blue-200">
-                120Hz ENGINE
+              <span className="px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700 text-[10px] font-bold font-mono border border-orange-200">
+                Smooth Ink
               </span>
             </div>
-
-            <div className="flex items-center gap-4 text-xs font-mono text-slate-600">
-              <span>Sync: <strong className="text-blue-600">120Hz High-Refresh</strong></span>
-              <span>DB: <strong className="text-emerald-600">Supabase RLS</strong></span>
+            <p className="text-xs text-slate-600 leading-relaxed font-body">
+              Catmull-Rom spline interpolation converts raw cursor input into fluid pressure-sensitive vector curves.
+            </p>
+            <div className="pt-2 text-[11px] font-mono text-slate-500 flex justify-between">
+              <span>Interpolation: Bezier</span>
+              <span>Sync: <strong className="text-orange-500">120Hz High-Refresh</strong></span>
             </div>
           </div>
 
-          {/* Large Unified Canvas Workspace Grid */}
-          <div className="min-h-[500px] rounded-2xl bg-slate-50 border border-slate-200 relative overflow-hidden p-6 shadow-inner">
-            <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-70" />
-
-            {/* SVG Connecting Lines between Canvas Shape Nodes */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-              <line x1="280" y1="100" x2="420" y2="100" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4" />
-              <line x1="680" y1="100" x2="780" y2="100" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4" />
-              <line x1="200" y1="200" x2="200" y2="300" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4" />
-              <line x1="550" y1="200" x2="550" y2="300" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4" />
-            </svg>
-
-            {/* Interactive Connected Nodes in Canvas */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-              {/* Node 01: Bezier Ink Stroke Canvas Node */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 01 // 120Hz INK ENGINE
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-500">{strokeWidth}px</span>
-                </div>
-                <p className="text-xs font-bold text-slate-900">120Hz Bezier Pressure Generator</p>
+          {/* Card 2 */}
+          <div className="glass-card p-6 space-y-4 hover:border-orange-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 font-heading">
+                Dynamic Stroke Thickness
+              </span>
+              <span className="text-xs font-mono font-bold text-slate-700">{strokeWidth}px</span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed font-body">
+              Adjust stroke width dynamically with live preview across freehand drawings and vector shapes.
+            </p>
+            <div className="pt-2 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-orange-500 uppercase">
+                  Adjust Width:
+                </span>
                 <input
                   type="range"
                   min={2}
-                  max={16}
+                  max={24}
                   value={strokeWidth}
                   onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                  className="w-full accent-blue-600 cursor-pointer"
+                  className="w-full accent-orange-500 cursor-pointer"
                 />
-                <svg className="w-full h-12 bg-slate-50 rounded-xl border border-slate-200">
-                  <path
-                    d="M 10 24 Q 60 5, 120 24 T 220 24"
-                    fill="none"
-                    stroke={activeColor}
-                    strokeWidth={strokeWidth}
-                    strokeLinecap="round"
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="glass-card p-6 space-y-4 hover:border-orange-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 font-heading">
+                Last-Write-Wins CRDT Engine
+              </span>
+              <button
+                onClick={() => setCrdtCount((c) => c + 1)}
+                className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold font-mono transition"
+              >
+                + Sim Delta
+              </button>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed font-body">
+              Conflict-free replicated data type engine guarantees eventual consistency across all connected room peers.
+            </p>
+            <div className="pt-2 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold text-orange-500 uppercase">
+                Deltas Synced: {crdtCount}
+              </span>
+              <span className="text-[10px] font-mono text-orange-500 font-bold">v{crdtCount}.0</span>
+            </div>
+            <div>
+              <button
+                onClick={() => setCrdtCount((c) => c + 1)}
+                className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl transition shadow-md"
+              >
+                Dispatch Real-Time Delta ({crdtCount})
+              </button>
+            </div>
+          </div>
+
+          {/* Card 4 */}
+          <div className="glass-card p-6 space-y-4 hover:border-orange-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 font-heading">
+                Curated Color Palette
+              </span>
+              <div
+                className="w-4 h-4 rounded-full border border-slate-300 shadow-sm"
+                style={{ backgroundColor: activeColor }}
+              />
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed font-body">
+              Switch stroke and fill colors seamlessly across rectangles, circles, notes, and freehand ink.
+            </p>
+            <div className="pt-1 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold text-orange-500 uppercase">
+                Palette:
+              </span>
+              <div className="flex gap-1.5">
+                {['#F97316', '#2563EB', '#10B981', '#F59E0B', '#EF4444'].map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setActiveColor(c)}
+                    className={`w-4 h-4 rounded-full border transition-transform ${
+                      activeColor === c ? 'scale-125 ring-2 ring-orange-500 border-white' : 'hover:scale-110'
+                    }`}
+                    style={{ backgroundColor: c }}
                   />
-                </svg>
+                ))}
               </div>
+            </div>
+          </div>
 
-              {/* Node 02: CRDT LWW Sync Engine Node */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 02 // CRDT SYNC
-                  </span>
-                  <span className="text-[10px] font-mono text-blue-600 font-bold">v{crdtCount}.0</span>
-                </div>
-                <p className="text-xs font-bold text-slate-900">Conflict-Free LWW Resolver</p>
-                <p className="text-[10px] text-slate-600">Deterministic timestamp delta merging:</p>
-                <button
-                  onClick={() => setCrdtCount((c) => c + 1)}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition shadow-md"
-                >
-                  + Push WebSocket Delta
-                </button>
-              </div>
+          {/* Card 5 */}
+          <div className="glass-card p-6 space-y-4 hover:border-orange-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 font-heading">
+                Vector SVG & JSON Export
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold font-mono">
+                SVG/JSON
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed font-body">
+              Export entire whiteboard sessions into clean scale-independent vector SVG graphics or JSON state snapshots.
+            </p>
+            <div className="pt-2 text-[11px] font-mono text-slate-500 flex justify-between">
+              <span>Precision: 100% Vector</span>
+              <span className="text-orange-500 font-bold">Instant Export</span>
+            </div>
+          </div>
 
-              {/* Node 03: Vector Shapes & Color Element Node */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 03 // VECTOR PALETTE
-                  </span>
-                </div>
-                <p className="text-xs font-bold text-slate-900">Vector Shape Color Picker</p>
-                <div className="flex items-center justify-between pt-1">
-                  <div className="flex gap-1.5">
-                    {['#2563EB', '#10B981', '#F59E0B', '#EF4444'].map((c) => (
-                      <button
-                        key={c}
-                        onClick={() => setActiveColor(c)}
-                        className={`w-6 h-6 rounded-full border transition-transform ${
-                          activeColor === c ? 'scale-125 ring-2 ring-blue-600 border-white' : 'hover:scale-110'
-                        }`}
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
-                  </div>
-
-                  <div
-                    className="w-10 h-10 rounded-xl border-2 shadow-md flex items-center justify-center font-bold text-[9px] text-white"
-                    style={{ backgroundColor: activeColor, borderColor: activeColor }}
-                  >
-                    Shape
-                  </div>
-                </div>
-              </div>
-
-              {/* Node 04: Real-time Multi-Cursor Element Node */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 04 // MULTI-CURSORS
-                  </span>
-                </div>
-                <p className="text-xs font-bold text-slate-900">Multiplayer Cursor Stream</p>
-                <div className="bg-slate-900 p-3 rounded-xl flex items-center justify-center">
-                  <div className="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold font-mono flex items-center gap-2 shadow-md">
-                    <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                    <span>Sarah (Live 120Hz Stream)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Node 05: Vector SVG & JSON Code Node */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 05 // EXPORT FORMATS
-                  </span>
-                </div>
-                <p className="text-xs font-bold text-slate-900">SVG & JSON Markup Inspector</p>
-                <div className="bg-slate-950 p-2.5 rounded-xl text-[10px] font-mono text-emerald-400">
-                  <code>&lt;path stroke="{activeColor}" /&gt;</code>
-                </div>
-              </div>
-
-              {/* Node 06: Supabase PostgreSQL DB Persistence Node */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xl space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-mono font-bold text-blue-600 uppercase">
-                    NODE 06 // DB PERSISTENCE
-                  </span>
-                </div>
-                <p className="text-xs font-bold text-slate-900">Supabase RLS Table Sync</p>
-                <div className="bg-slate-100 p-2.5 rounded-xl flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-600">PostgreSQL:</span>
-                  <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px]">
-                    CONNECTED
-                  </span>
-                </div>
-              </div>
+          {/* Card 6 */}
+          <div className="glass-card p-6 space-y-4 hover:border-orange-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 font-heading">
+                Supabase PostgreSQL Saves
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold font-mono">
+                PostgreSQL
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed font-body">
+              Persistent room board storage backed by Supabase PostgreSQL RLS policies for security.
+            </p>
+            <div className="pt-2 text-[11px] font-mono text-slate-500 flex justify-between">
+              <span>Database: Supabase</span>
+              <span className="text-orange-500 font-bold">RLS Active</span>
             </div>
           </div>
         </div>

@@ -6,339 +6,327 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterPage() {
-  const { signUp } = useAuth();
-  const router = useRouter();
+  const [formData, setFormData] = useState({
+    name: '',
+    surname: '',
+    age: '',
+    career: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    country: 'United States',
+    town: '',
+  });
 
-  // Form State
-  const [firstName, setFirstName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [age, setAge] = useState('');
-  const [career, setCareer] = useState('');
-  const [country, setCountry] = useState('');
-  const [town, setTown] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  // Password Visibility State
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Error & Loading State
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Password Validator Checklist Rules
-  const hasMinLength = password.length >= 8;
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasLowercase = /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  const passwordsMatch = password.length > 0 && password === confirmPassword;
+  const { signUp } = useAuth();
+  const router = useRouter();
 
-  // Calculate Password Strength Score (0 to 4)
-  const getPasswordStrength = () => {
-    let score = 0;
-    if (hasMinLength) score++;
-    if (hasUppercase && hasLowercase) score++;
-    if (hasNumber) score++;
-    if (hasSpecialChar) score++;
-    return score;
+  // Password Strength & Validation Calculations
+  const password = formData.password;
+  const validations = {
+    minLength: password.length >= 8,
+    hasUpper: /[A-Z]/.test(password),
+    hasLower: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecial: /[^A-Za-z0-9]/.test(password),
+    matchConfirm: password.length > 0 && password === formData.confirmPassword,
   };
 
-  const strengthScore = getPasswordStrength();
+  const strengthScore = Object.values(validations).filter(Boolean).length;
 
-  const getStrengthLabel = () => {
-    if (password.length === 0) return { label: '', color: 'bg-slate-200', text: '' };
-    if (strengthScore <= 1) return { label: 'Weak', color: 'bg-red-500', text: 'text-red-600' };
-    if (strengthScore === 2) return { label: 'Fair', color: 'bg-amber-500', text: 'text-amber-600' };
-    if (strengthScore === 3) return { label: 'Strong', color: 'bg-blue-600', text: 'text-blue-600' };
-    return { label: 'Excellent', color: 'bg-emerald-500', text: 'text-emerald-600' };
+  const getStrengthMeta = () => {
+    if (strengthScore <= 2) return { label: 'Weak', color: 'bg-red-500', text: 'text-red-500' };
+    if (strengthScore <= 4) return { label: 'Moderate', color: 'bg-amber-500', text: 'text-amber-500' };
+    return { label: 'Strong', color: 'bg-orange-500', text: 'text-orange-500' };
   };
 
-  const strength = getStrengthLabel();
+  const strengthMeta = getStrengthMeta();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!hasMinLength || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar) {
-      setError('Please ensure your password meets all validation requirements.');
+    if (!validations.minLength) {
+      setError('Password must be at least 8 characters long.');
       return;
     }
-
-    if (!passwordsMatch) {
-      setError('Password and Confirm Password do not match.');
+    if (!validations.matchConfirm) {
+      setError('Passwords do not match.');
       return;
     }
 
     setLoading(true);
+    try {
+      const res = await signUp(formData.email, formData.password, {
+        firstName: formData.name,
+        surname: formData.surname,
+        age: formData.age,
+        career: formData.career,
+        country: formData.country,
+        town: formData.town,
+      });
 
-    const res = await signUp(email, password, {
-      firstName,
-      surname,
-      age,
-      career,
-      country,
-      town,
-    });
-
-    setLoading(false);
-
-    if (res.error) {
-      setError(res.error);
-    } else {
-      router.push('/dashboard');
+      if (res?.error) {
+        setError(typeof res.error === 'string' ? res.error : 'Registration failed.');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch {
+      setError('An unexpected registration error occurred.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex items-center justify-center p-4 py-12 relative overflow-hidden font-sans">
-      {/* Ambient Reflections */}
-      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-slate-300/20 rounded-full blur-3xl pointer-events-none" />
+    <main className="min-h-screen bg-[var(--color-bg)] py-12 px-6 flex items-center justify-center relative overflow-hidden font-sans">
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-2xl relative z-10">
-        <div className="text-center mb-8">
-          <span className="text-2xl font-black tracking-tight text-slate-900 block mb-2 font-heading">
+      <div className="w-full max-w-2xl glass-card p-8 sm:p-12 shadow-2xl relative z-10 space-y-8 border border-slate-200">
+        <div className="text-center space-y-2">
+          <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 font-heading inline-block">
             my-board
-          </span>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 font-heading">
-            Create your account
-          </h1>
-          <p className="text-slate-600 text-sm mt-2 font-body">
-            Join my-board to collaborate in real-time with high-frequency 120Hz canvas tools
+          </Link>
+          <h1 className="text-2xl font-extrabold text-slate-900 font-heading">Create Account</h1>
+          <p className="text-xs text-slate-600 font-body">
+            Fill out your profile details to join collaborative room sessions
           </p>
         </div>
 
-        {/* Form Card */}
-        <div className="glass-card p-8 shadow-2xl">
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold font-body">
+            {error}
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-6 text-left">
-            {/* 1. Name & Surname Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                  First Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Jane"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                  Surname *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={surname}
-                  onChange={(e) => setSurname(e.target.value)}
-                  placeholder="Doe"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
-              </div>
-            </div>
-
-            {/* 2. Age & Career Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                  Age *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="13"
-                  max="120"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="28"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                  Career / Profession *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={career}
-                  onChange={(e) => setCareer(e.target.value)}
-                  placeholder="UI Designer / Engineer"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
-              </div>
-            </div>
-
-            {/* 3. Location Row: Country & Town */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                  Country *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  placeholder="United States"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                  Town / City *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={town}
-                  onChange={(e) => setTown(e.target.value)}
-                  placeholder="San Francisco"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
-              </div>
-            </div>
-
-            {/* 4. Email Address */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                Email Address *
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Profile Multi-Column Group */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                First Name *
               </label>
               <input
-                type="email"
+                type="text"
+                name="name"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jane@myboard.dev"
-                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Jane"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
               />
             </div>
 
-            {/* 5. Password & Show/Hide Toggle */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                Password *
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                Surname *
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
+              <input
+                type="text"
+                name="surname"
+                required
+                value={formData.surname}
+                onChange={handleChange}
+                placeholder="Doe"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                Age
+              </label>
+              <input
+                type="number"
+                name="age"
+                min={13}
+                max={120}
+                value={formData.age}
+                onChange={handleChange}
+                placeholder="28"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                Career / Profession
+              </label>
+              <input
+                type="text"
+                name="career"
+                value={formData.career}
+                onChange={handleChange}
+                placeholder="Software Architect / UX Designer"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                Country
+              </label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              >
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Canada</option>
+                <option>Germany</option>
+                <option>Australia</option>
+                <option>South Africa</option>
+                <option>Japan</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                Town / City
+              </label>
+              <input
+                type="text"
+                name="town"
+                value={formData.town}
+                onChange={handleChange}
+                placeholder="San Francisco"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+              Email Address *
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="jane.doe@company.com"
+              className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+            />
+          </div>
+
+          {/* Password & Show/Hide Toggles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                  Password *
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 hover:text-blue-600 px-2 py-1 transition"
+                  className="text-[11px] font-semibold text-orange-500 hover:underline font-body"
                 >
                   {showPassword ? 'Hide' : 'View'}
                 </button>
               </div>
-
-              {/* Password Strength Progress Bar */}
-              {password.length > 0 && (
-                <div className="mt-3 space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] font-mono font-bold">
-                    <span className="text-slate-500">Password Strength:</span>
-                    <span className={strength.text}>{strength.label}</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-300 ${strength.color}`}
-                      style={{ width: `${(strengthScore / 4) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Real-time Password Validator Checklist */}
-              <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-mono">
-                <div className={`flex items-center gap-1.5 ${hasMinLength ? 'text-emerald-600 font-bold' : 'text-slate-500'}`}>
-                  <span>{hasMinLength ? '[v]' : '[ ]'}</span>
-                  <span>At least 8 characters</span>
-                </div>
-                <div className={`flex items-center gap-1.5 ${hasUppercase ? 'text-emerald-600 font-bold' : 'text-slate-500'}`}>
-                  <span>{hasUppercase ? '[v]' : '[ ]'}</span>
-                  <span>Uppercase letter (A-Z)</span>
-                </div>
-                <div className={`flex items-center gap-1.5 ${hasLowercase ? 'text-emerald-600 font-bold' : 'text-slate-500'}`}>
-                  <span>{hasLowercase ? '[v]' : '[ ]'}</span>
-                  <span>Lowercase letter (a-z)</span>
-                </div>
-                <div className={`flex items-center gap-1.5 ${hasNumber ? 'text-emerald-600 font-bold' : 'text-slate-500'}`}>
-                  <span>{hasNumber ? '[v]' : '[ ]'}</span>
-                  <span>Number (0-9)</span>
-                </div>
-                <div className={`flex items-center gap-1.5 ${hasSpecialChar ? 'text-emerald-600 font-bold' : 'text-slate-500'}`}>
-                  <span>{hasSpecialChar ? '[v]' : '[ ]'}</span>
-                  <span>Special char (!@#$)</span>
-                </div>
-              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              />
             </div>
 
-            {/* 6. Confirm Password & Show/Hide Toggle */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 font-heading">
-                Confirm Password *
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body transition"
-                />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 font-heading uppercase tracking-wider">
+                  Confirm Password *
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 hover:text-blue-600 px-2 py-1 transition"
+                  className="text-[11px] font-semibold text-orange-500 hover:underline font-body"
                 >
                   {showConfirmPassword ? 'Hide' : 'View'}
                 </button>
               </div>
-
-              {confirmPassword.length > 0 && (
-                <p className={`text-[10px] font-mono mt-1.5 font-bold ${passwordsMatch ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
-                </p>
-              )}
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body transition"
+              />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center !py-3.5 shadow-lg font-heading"
-            >
-              <span>{loading ? 'Creating Account...' : 'Complete Registration'}</span>
-            </button>
-          </form>
+          {/* Password Strength Indicator */}
+          {formData.password.length > 0 && (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 font-body">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-slate-700 font-heading">Password Strength:</span>
+                <span className={strengthMeta.text}>{strengthMeta.label}</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-300 ${strengthMeta.color}`}
+                  style={{ width: `${(strengthScore / 6) * 100}%` }}
+                />
+              </div>
 
-          <p className="text-center text-xs text-slate-600 mt-6 font-body">
-            Already have an account?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-semibold underline underline-offset-4">
-              Sign in
-            </Link>
-          </p>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div className={validations.minLength ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                  {validations.minLength ? '✓' : '○'} At least 8 characters
+                </div>
+                <div className={validations.hasUpper ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                  {validations.hasUpper ? '✓' : '○'} Upper case letter
+                </div>
+                <div className={validations.hasLower ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                  {validations.hasLower ? '✓' : '○'} Lower case letter
+                </div>
+                <div className={validations.hasNumber ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                  {validations.hasNumber ? '✓' : '○'} Number
+                </div>
+                <div className={validations.hasSpecial ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                  {validations.hasSpecial ? '✓' : '○'} Special character
+                </div>
+                <div className={validations.matchConfirm ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                  {validations.matchConfirm ? '✓' : '○'} Passwords match
+                </div>
+              </div>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full btn-primary justify-center !py-3.5 shadow-lg text-xs font-heading"
+          >
+            {loading ? 'Registering Account...' : 'Complete Profile & Sign Up'}
+          </button>
+        </form>
+
+        <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-600 font-body">
+          Already have an account?{' '}
+          <Link href="/login" className="font-bold text-orange-500 hover:underline font-heading">
+            Sign In Here
+          </Link>
         </div>
       </div>
     </main>
