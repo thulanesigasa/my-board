@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, use } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getSocket } from '@/lib/socket';
-import { BaseShape, Point, ToolType, UserPresence } from '@/types/board';
+import { BaseShape, Point, ToolType, ShapeType, UserPresence } from '@/types/board';
 import { Canvas } from '@/components/Board/Canvas';
 import { Toolbar } from '@/components/Board/Toolbar';
 import { Header } from '@/components/Board/Header';
@@ -200,8 +200,42 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
     }
   }, [history, historyIndex]);
 
-  const handleSelectWidget = (tool: ToolType) => {
-    setActiveTool(tool);
+  // Widget template insertion with automatic switch to cursor select mode
+  const handleSelectWidget = (tool: ToolType, templateTitle?: string) => {
+    const newShapeId = `widget_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const widgetDimensions: Record<string, { width: number; height: number }> = {
+      kanban: { width: 440, height: 260 },
+      table: { width: 400, height: 210 },
+      timeline: { width: 480, height: 180 },
+      doc: { width: 360, height: 240 },
+      slides: { width: 440, height: 260 },
+      prototype: { width: 240, height: 380 },
+      diagram: { width: 440, height: 200 },
+      engage: { width: 340, height: 220 },
+      talktrack: { width: 340, height: 180 },
+    };
+
+    const dims = widgetDimensions[tool] || { width: 360, height: 220 };
+    const newWidgetShape: BaseShape = {
+      id: newShapeId,
+      type: tool as ShapeType,
+      x: 350 + Math.random() * 80,
+      y: 180 + Math.random() * 60,
+      width: dims.width,
+      height: dims.height,
+      strokeColor: '#F97316',
+      fillColor: '#FFFFFF',
+      strokeWidth: 1,
+      text: templateTitle || 'Interactive Widget',
+      updatedAt: Date.now(),
+      createdBy: currentUserId,
+      zIndex: shapes.length,
+    };
+
+    handleAddShape(newWidgetShape);
+
+    // Automatically switch to cursor select mode immediately
+    setActiveTool('select');
   };
 
   return (
