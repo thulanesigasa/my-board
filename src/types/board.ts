@@ -4,6 +4,9 @@ export type ToolType =
   | 'highlighter'
   | 'rectangle'
   | 'circle'
+  | 'diamond'
+  | 'triangle'
+  | 'star'
   | 'line'
   | 'arrow'
   | 'text'
@@ -15,7 +18,17 @@ export interface Point {
   y: number;
 }
 
-export type ShapeType = 'freehand' | 'rectangle' | 'circle' | 'line' | 'arrow' | 'text' | 'stickyNote';
+export type ShapeType =
+  | 'freehand'
+  | 'rectangle'
+  | 'circle'
+  | 'diamond'
+  | 'triangle'
+  | 'star'
+  | 'line'
+  | 'arrow'
+  | 'text'
+  | 'stickyNote';
 
 export interface BaseShape {
   id: string;

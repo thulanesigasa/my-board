@@ -35,7 +35,6 @@ export const Canvas: React.FC<CanvasProps> = ({
   onSelectionChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [viewport, setViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -45,7 +44,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [dragStart, setDragStart] = useState<Point | null>(null);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
 
-  // Convert screen coordinates to canvas viewport coordinates
+  // Screen coordinates to canvas viewport transformation
   const screenToCanvas = useCallback(
     (screenX: number, screenY: number): Point => {
       if (!containerRef.current) return { x: screenX, y: screenY };
@@ -57,19 +56,36 @@ export const Canvas: React.FC<CanvasProps> = ({
     [viewport]
   );
 
-  // Synchronize selection changes with parent
+  // Synchronize selection changes
   useEffect(() => {
     onSelectionChange(selectedShapeIds);
   }, [selectedShapeIds, onSelectionChange]);
 
-  // Handle pointer down (Mouse/Touch/Stylus)
+  // Instant Delete & Backspace Key Deletion Event Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShapeIds.length > 0) {
+        e.preventDefault();
+        selectedShapeIds.forEach((id) => onDeleteShape(id));
+        setSelectedShapeIds([]);
+        setActiveShape(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedShapeIds, onDeleteShape]);
+
+  // Handle pointer down
   const handlePointerDown = (e: React.PointerEvent) => {
     if (editingTextId) setEditingTextId(null);
 
     const point = screenToCanvas(e.clientX, e.clientY);
 
     if (activeTool === 'select') {
-      // Hit test shapes top to bottom
       const clickedShape = [...shapes].reverse().find((s) => isPointInShape(point, s));
       if (clickedShape) {
         setSelectedShapeIds([clickedShape.id]);
@@ -109,7 +125,15 @@ export const Canvas: React.FC<CanvasProps> = ({
         zIndex: shapes.length,
       };
       setActiveShape(newShape);
-    } else if (activeTool === 'rectangle' || activeTool === 'circle' || activeTool === 'line' || activeTool === 'arrow') {
+    } else if (
+      activeTool === 'rectangle' ||
+      activeTool === 'circle' ||
+      activeTool === 'diamond' ||
+      activeTool === 'triangle' ||
+      activeTool === 'star' ||
+      activeTool === 'line' ||
+      activeTool === 'arrow'
+    ) {
       const newShape: BaseShape = {
         id: newShapeId,
         type: activeTool,
@@ -133,10 +157,10 @@ export const Canvas: React.FC<CanvasProps> = ({
         y: point.y - 80,
         width: 160,
         height: 160,
-        strokeColor: '#FACC15',
+        strokeColor: '#F97316',
         fillColor: '#FEF08A',
         strokeWidth: 1,
-        text: 'New Note',
+        text: 'Sticky Note',
         updatedAt: Date.now(),
         createdBy: currentUserId,
         zIndex: shapes.length,
@@ -154,7 +178,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         height: 40,
         strokeColor,
         strokeWidth: 1,
-        text: 'Type text...',
+        text: 'Double-click to edit text',
         updatedAt: Date.now(),
         createdBy: currentUserId,
         zIndex: shapes.length,
@@ -198,7 +222,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         points: updatedPoints,
         updatedAt: Date.now(),
       });
-    } else if (activeShape.type === 'rectangle' || activeShape.type === 'circle' || activeShape.type === 'line' || activeShape.type === 'arrow') {
+    } else {
       const width = point.x - activeShape.x;
       const height = point.y - activeShape.y;
       setActiveShape({
@@ -237,6 +261,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   // Render SVG Shape
   const renderSvgShape = (shape: BaseShape) => {
     const isSelected = selectedShapeIds.includes(shape.id);
+    const bounds = getShapeBounds(shape);
 
     if (shape.type === 'freehand') {
       if (!shape.points || shape.points.length === 0) return null;
@@ -252,39 +277,187 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
 
     if (shape.type === 'rectangle') {
-      const bounds = getShapeBounds(shape);
       return (
-        <rect
-          key={shape.id}
-          x={bounds.x}
-          y={bounds.y}
-          width={bounds.width}
-          height={bounds.height}
-          stroke={shape.strokeColor}
-          fill={shape.fillColor || 'transparent'}
-          strokeWidth={shape.strokeWidth}
-          rx={6}
-        />
+        <g key={shape.id} onDoubleClick={() => setEditingTextId(shape.id)}>
+          <rect
+            x={bounds.x}
+            y={bounds.y}
+            width={bounds.width}
+            height={bounds.height}
+            stroke={shape.strokeColor}
+            fill={shape.fillColor || 'transparent'}
+            strokeWidth={shape.strokeWidth}
+            rx={6}
+          />
+          {editingTextId === shape.id ? (
+            <foreignObject x={bounds.x + 4} y={bounds.y + 4} width={bounds.width - 8} height={bounds.height - 8}>
+              <textarea
+                autoFocus
+                defaultValue={shape.text || ''}
+                onChange={(e) => onUpdateShape({ ...shape, text: e.target.value, updatedAt: Date.now() })}
+                onBlur={() => setEditingTextId(null)}
+                className="w-full h-full bg-transparent text-slate-900 font-bold text-xs border-none focus:outline-none resize-none p-1 font-heading text-center"
+              />
+            </foreignObject>
+          ) : (
+            shape.text && (
+              <text
+                x={bounds.x + bounds.width / 2}
+                y={bounds.y + bounds.height / 2}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill={shape.strokeColor}
+                fontSize={13}
+                fontWeight="700"
+                fontFamily="var(--font-heading)"
+              >
+                {shape.text}
+              </text>
+            )
+          )}
+        </g>
       );
     }
 
     if (shape.type === 'circle') {
-      const bounds = getShapeBounds(shape);
       const rx = bounds.width / 2;
       const ry = bounds.height / 2;
       const cx = bounds.x + rx;
       const cy = bounds.y + ry;
       return (
-        <ellipse
-          key={shape.id}
-          cx={cx}
-          cy={cy}
-          rx={Math.max(0, rx)}
-          ry={Math.max(0, ry)}
-          stroke={shape.strokeColor}
-          fill={shape.fillColor || 'transparent'}
-          strokeWidth={shape.strokeWidth}
-        />
+        <g key={shape.id} onDoubleClick={() => setEditingTextId(shape.id)}>
+          <ellipse
+            cx={cx}
+            cy={cy}
+            rx={Math.max(0, rx)}
+            ry={Math.max(0, ry)}
+            stroke={shape.strokeColor}
+            fill={shape.fillColor || 'transparent'}
+            strokeWidth={shape.strokeWidth}
+          />
+          {editingTextId === shape.id ? (
+            <foreignObject x={bounds.x + 8} y={bounds.y + 8} width={bounds.width - 16} height={bounds.height - 16}>
+              <textarea
+                autoFocus
+                defaultValue={shape.text || ''}
+                onChange={(e) => onUpdateShape({ ...shape, text: e.target.value, updatedAt: Date.now() })}
+                onBlur={() => setEditingTextId(null)}
+                className="w-full h-full bg-transparent text-slate-900 font-bold text-xs border-none focus:outline-none resize-none p-1 font-heading text-center"
+              />
+            </foreignObject>
+          ) : (
+            shape.text && (
+              <text
+                x={cx}
+                y={cy}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill={shape.strokeColor}
+                fontSize={13}
+                fontWeight="700"
+                fontFamily="var(--font-heading)"
+              >
+                {shape.text}
+              </text>
+            )
+          )}
+        </g>
+      );
+    }
+
+    if (shape.type === 'diamond') {
+      const cx = bounds.x + bounds.width / 2;
+      const cy = bounds.y + bounds.height / 2;
+      const points = `${cx},${bounds.y} ${bounds.x + bounds.width},${cy} ${cx},${bounds.y + bounds.height} ${bounds.x},${cy}`;
+      return (
+        <g key={shape.id} onDoubleClick={() => setEditingTextId(shape.id)}>
+          <polygon
+            points={points}
+            stroke={shape.strokeColor}
+            fill={shape.fillColor || 'transparent'}
+            strokeWidth={shape.strokeWidth}
+          />
+          {shape.text && (
+            <text
+              x={cx}
+              y={cy}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill={shape.strokeColor}
+              fontSize={13}
+              fontWeight="700"
+              fontFamily="var(--font-heading)"
+            >
+              {shape.text}
+            </text>
+          )}
+        </g>
+      );
+    }
+
+    if (shape.type === 'triangle') {
+      const cx = bounds.x + bounds.width / 2;
+      const points = `${cx},${bounds.y} ${bounds.x + bounds.width},${bounds.y + bounds.height} ${bounds.x},${bounds.y + bounds.height}`;
+      return (
+        <g key={shape.id} onDoubleClick={() => setEditingTextId(shape.id)}>
+          <polygon
+            points={points}
+            stroke={shape.strokeColor}
+            fill={shape.fillColor || 'transparent'}
+            strokeWidth={shape.strokeWidth}
+          />
+          {shape.text && (
+            <text
+              x={cx}
+              y={bounds.y + (bounds.height * 2) / 3}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill={shape.strokeColor}
+              fontSize={13}
+              fontWeight="700"
+              fontFamily="var(--font-heading)"
+            >
+              {shape.text}
+            </text>
+          )}
+        </g>
+      );
+    }
+
+    if (shape.type === 'star') {
+      const cx = bounds.x + bounds.width / 2;
+      const cy = bounds.y + bounds.height / 2;
+      const outerR = Math.min(bounds.width, bounds.height) / 2;
+      const innerR = outerR / 2.2;
+      const pts: string[] = [];
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 === 0 ? outerR : innerR;
+        const angle = (i * Math.PI) / 5 - Math.PI / 2;
+        pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+      }
+      return (
+        <g key={shape.id} onDoubleClick={() => setEditingTextId(shape.id)}>
+          <polygon
+            points={pts.join(' ')}
+            stroke={shape.strokeColor}
+            fill={shape.fillColor || 'transparent'}
+            strokeWidth={shape.strokeWidth}
+          />
+          {shape.text && (
+            <text
+              x={cx}
+              y={cy}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill={shape.strokeColor}
+              fontSize={12}
+              fontWeight="700"
+              fontFamily="var(--font-heading)"
+            >
+              {shape.text}
+            </text>
+          )}
+        </g>
       );
     }
 
@@ -320,26 +493,24 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
 
     if (shape.type === 'stickyNote') {
-      const bounds = getShapeBounds(shape);
       return (
-        <g key={shape.id}>
+        <g key={shape.id} onDoubleClick={() => setEditingTextId(shape.id)}>
           <rect
             x={bounds.x}
             y={bounds.y}
             width={bounds.width}
             height={bounds.height}
             fill={shape.fillColor || '#FEF08A'}
-            stroke="#EAB308"
-            strokeWidth={1}
-            rx={8}
-            className="shadow-xl"
+            stroke={shape.strokeColor || '#F97316'}
+            strokeWidth={1.5}
+            rx={12}
           />
           <foreignObject x={bounds.x + 8} y={bounds.y + 8} width={bounds.width - 16} height={bounds.height - 16}>
             <textarea
               defaultValue={shape.text || ''}
               onChange={(e) => onUpdateShape({ ...shape, text: e.target.value, updatedAt: Date.now() })}
               placeholder="Type note..."
-              className="w-full h-full bg-transparent text-slate-900 font-medium text-sm border-none focus:outline-none resize-none placeholder-slate-500"
+              className="w-full h-full bg-transparent text-slate-900 font-semibold text-xs border-none focus:outline-none resize-none placeholder-slate-500 font-body"
             />
           </foreignObject>
         </g>
@@ -347,7 +518,6 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
 
     if (shape.type === 'text') {
-      const bounds = getShapeBounds(shape);
       return (
         <foreignObject key={shape.id} x={bounds.x} y={bounds.y} width={Math.max(150, bounds.width)} height={Math.max(40, bounds.height)}>
           <input
@@ -356,7 +526,7 @@ export const Canvas: React.FC<CanvasProps> = ({
             onChange={(e) => onUpdateShape({ ...shape, text: e.target.value, updatedAt: Date.now() })}
             placeholder="Type text..."
             style={{ color: shape.strokeColor }}
-            className="w-full bg-transparent font-semibold text-lg border-b border-indigo-500/40 focus:border-indigo-400 focus:outline-none px-1"
+            className="w-full bg-transparent font-extrabold text-lg border-b border-orange-500/40 focus:border-orange-500 focus:outline-none px-1 font-heading"
           />
         </foreignObject>
       );
@@ -372,10 +542,10 @@ export const Canvas: React.FC<CanvasProps> = ({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerLeave}
-      className="w-full h-screen bg-slate-950 touch-none overflow-hidden select-none relative cursor-crosshair"
+      className="w-full h-screen bg-white touch-none overflow-hidden select-none relative cursor-crosshair"
     >
-      {/* Background Dot Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
+      {/* Background Light Dot Grid */}
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-60 pointer-events-none" />
 
       {/* SVG Vector Layer */}
       <svg className="w-full h-full absolute inset-0 pointer-events-none">
@@ -396,8 +566,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                 width={bounds.width + 8}
                 height={bounds.height + 8}
                 fill="none"
-                stroke="#6366F1"
-                strokeWidth={1.5}
+                stroke={shape.strokeColor || '#F97316'}
+                strokeWidth={2}
                 strokeDasharray="4 4"
               />
             );

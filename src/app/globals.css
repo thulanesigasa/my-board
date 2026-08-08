@@ -2,28 +2,28 @@
 
 /* ─── 60-30-10 COLOR SCHEME & POPPINS / CALIBRI TYPOGRAPHY SYSTEM ────
    60% Dominant : Crisp White & Off-White (#FFFFFF / #F8FAFC)
-   30% Secondary: Slate Grey & Cool Charcoal (#0F172A / #334155 / #E2E8F0)
-   10% Accent   : Electric Vibrant Blue (#2563EB / #1D4ED8)
+   30% Secondary: Deep Charcoal Black & Slate Grey (#000000 / #0F172A / #E2E8F0)
+   10% Accent   : Vibrant Orange (#F97316 / #EA580C) [Matching makemynotes]
    Typography   : Poppins Bold, Poppins, & Calibri
    ───────────────────────────────────────────────────────────── */
 
 :root {
-  /* 60% Dominant - Crisp White Base & Light Glass Cards */
+  /* 60% Dominant - Crisp White Base & Light Cards */
   --color-bg: #f8fafc;
   --color-bg-card: #ffffff;
   --color-bg-card-hover: #ffffff;
   --color-surface: #ffffff;
   --color-surface-2: #f1f5f9;
 
-  /* 30% Secondary - Slate Grey Typography & Structural Borders */
+  /* 30% Secondary - Charcoal Black Typography & Structural Borders */
   --color-text: #0f172a;
   --color-secondary: #475569;
   --color-text-muted: #64748b;
   --color-border: #e2e8f0;
 
-  /* 10% Accent - Electric Vibrant Blue */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
+  /* 10% Accent - Vibrant Orange (Matching makemynotes) */
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
 
   /* Typography: Poppins Bold, Poppins & Calibri */
   --font-heading: var(--font-poppins), 'Poppins', sans-serif;
@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text);
 }
 
-/* Glassmorphism Card Utility (60% White + 30% Slate Border, Zero Glow) */
+/* Glassmorphism Card Utility (60% White + 30% Charcoal Border, Zero Glow) */
 .glass-card {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-hover);
 }
 
-/* 10% Blue Accent Buttons (Zero Glow) */
+/* 10% Orange Accent Buttons (Matching makemynotes) */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Typography Gradient */
 .gradient-text {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2563eb 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #f97316 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

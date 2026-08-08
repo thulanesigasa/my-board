@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface SandboxShape {
   id: number;
@@ -12,7 +12,7 @@ interface SandboxShape {
   color: string;
 }
 
-const PALETTE = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#475569'];
+const PALETTE = ['#F97316', '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#475569'];
 
 export const InteractiveSandbox: React.FC = () => {
   const [activeTool, setActiveTool] = useState<'rect' | 'circle' | 'note'>('rect');
@@ -52,6 +52,24 @@ export const InteractiveSandbox: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingIdRef = useRef<number | null>(null);
   const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Instant Delete & Backspace Key Event Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId !== null) {
+        e.preventDefault();
+        setShapes((prev) => prev.filter((s) => s.id !== selectedId));
+        setSelectedId(null);
+        setEditingId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedId]);
 
   const addShape = () => {
     const newId = Date.now();
@@ -140,7 +158,7 @@ export const InteractiveSandbox: React.FC = () => {
           Try The Live Interactive Canvas Sandbox
         </h2>
         <p className="text-slate-600 text-sm max-w-xl mx-auto mb-10 leading-relaxed font-body">
-          Drag shapes around at native 1-to-1 cursor speed, double-click to edit title & multiline body text, and pick colors from the palette.
+          Drag shapes around, double-click to edit, or press <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs font-mono font-bold">Delete</kbd> / <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs font-mono font-bold">Backspace</kbd> to remove shapes instantly.
         </p>
 
         {/* Sandbox Glass Container */}
@@ -152,7 +170,7 @@ export const InteractiveSandbox: React.FC = () => {
               <button
                 onClick={() => setActiveTool('rect')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                  activeTool === 'rect' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  activeTool === 'rect' ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 Rectangle
@@ -160,7 +178,7 @@ export const InteractiveSandbox: React.FC = () => {
               <button
                 onClick={() => setActiveTool('circle')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                  activeTool === 'circle' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  activeTool === 'circle' ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 Circle
@@ -168,7 +186,7 @@ export const InteractiveSandbox: React.FC = () => {
               <button
                 onClick={() => setActiveTool('note')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                  activeTool === 'note' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  activeTool === 'note' ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 Sticky Note
@@ -185,7 +203,7 @@ export const InteractiveSandbox: React.FC = () => {
                       key={c}
                       onClick={() => updateSelectedColor(c)}
                       className={`w-5 h-5 rounded-full border transition-transform ${
-                        selectedShape.color === c ? 'scale-125 ring-2 ring-blue-600 border-white' : 'hover:scale-110'
+                        selectedShape.color === c ? 'scale-125 ring-2 ring-orange-500 border-white' : 'hover:scale-110'
                       }`}
                       style={{ backgroundColor: c }}
                     />
