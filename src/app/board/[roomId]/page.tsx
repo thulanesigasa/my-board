@@ -200,6 +200,10 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
     }
   }, [history, historyIndex]);
 
+  const handleSelectWidget = (tool: ToolType) => {
+    setActiveTool(tool);
+  };
+
   return (
     <main className="w-full h-screen relative overflow-hidden bg-white">
       <Header
@@ -209,6 +213,7 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
         presences={presences}
         shapes={shapes}
         isConnected={isConnected}
+        onSelectWidget={handleSelectWidget}
       />
 
       <Canvas

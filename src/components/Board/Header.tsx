@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { UserPresence, BaseShape } from '@/types/board';
+import { UserPresence, BaseShape, ToolType } from '@/types/board';
 import { Wifi, WifiOff, Download, Share2, ArrowLeft } from 'lucide-react';
 import { exportToSvg, exportToJson } from '@/lib/drawing';
+import { WidgetPickerMenu } from './WidgetPickerMenu';
 
 interface HeaderProps {
   roomId: string;
@@ -13,6 +14,7 @@ interface HeaderProps {
   presences: UserPresence[];
   shapes: BaseShape[];
   isConnected: boolean;
+  onSelectWidget?: (tool: ToolType) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   presences,
   shapes,
   isConnected,
+  onSelectWidget,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -69,6 +72,8 @@ export const Header: React.FC<HeaderProps> = ({
             {roomId}
           </div>
         </div>
+
+        {onSelectWidget && <WidgetPickerMenu onSelectWidget={onSelectWidget} />}
       </div>
 
       {/* Center Multiplayer Presence Avatars */}
