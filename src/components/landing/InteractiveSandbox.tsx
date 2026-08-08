@@ -69,10 +69,12 @@ export const InteractiveSandbox: React.FC = () => {
     setEditingId(newId);
   };
 
-  const handleMouseDown = (id: number, e: React.MouseEvent) => {
+  // High-frequency native pointer drag handling matching physical mouse cursor speed 1-to-1
+  const handlePointerDown = (id: number, e: React.PointerEvent) => {
     e.stopPropagation();
     setSelectedId(id);
     draggingIdRef.current = id;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
 
     const shape = shapes.find((s) => s.id === id);
     if (shape && containerRef.current) {
@@ -84,7 +86,7 @@ export const InteractiveSandbox: React.FC = () => {
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     if (draggingIdRef.current === null || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const newX = Math.max(10, Math.min(rect.width - 180, e.clientX - rect.left - dragOffsetRef.current.x));
@@ -95,8 +97,15 @@ export const InteractiveSandbox: React.FC = () => {
     );
   };
 
-  const handleMouseUp = () => {
-    draggingIdRef.current = null;
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (draggingIdRef.current !== null) {
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // Safe fallback if capture already released
+      }
+      draggingIdRef.current = null;
+    }
   };
 
   // Deactivate active shapes when double-clicking or single-clicking on empty background
@@ -131,7 +140,7 @@ export const InteractiveSandbox: React.FC = () => {
           Try The Live Interactive Canvas Sandbox
         </h2>
         <p className="text-slate-600 text-sm max-w-xl mx-auto mb-10 leading-relaxed font-body">
-          Drag shapes around, double-click to edit title & multiline body text, and pick colors from the palette.
+          Drag shapes around at native 1-to-1 cursor speed, double-click to edit title & multiline body text, and pick colors from the palette.
         </p>
 
         {/* Sandbox Glass Container */}
@@ -203,10 +212,9 @@ export const InteractiveSandbox: React.FC = () => {
             ref={containerRef}
             onClick={handleBackgroundClick}
             onDoubleClick={handleBackgroundClick}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            className="canvas-grid-bg h-96 rounded-2xl bg-white border border-slate-200 relative overflow-hidden shadow-inner select-none cursor-crosshair"
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            className="canvas-grid-bg h-96 rounded-2xl bg-white border border-slate-200 relative overflow-hidden shadow-inner select-none cursor-crosshair touch-none"
           >
             <div className="canvas-grid-bg absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] opacity-60 pointer-events-none" />
 
@@ -214,17 +222,23 @@ export const InteractiveSandbox: React.FC = () => {
               const isSelected = selectedId === s.id;
               const isEditing = editingId === s.id;
 
+              const activeOutlineStyle = isSelected
+                ? {
+                    boxShadow: `0 0 0 2.5px ${s.color}, 0 10px 20px -5px ${s.color}40`,
+                  }
+                : {};
+
               if (s.type === 'note') {
                 return (
                   <div
                     key={s.id}
-                    onMouseDown={(e) => handleMouseDown(s.id, e)}
+                    onPointerDown={(e) => handlePointerDown(s.id, e)}
                     onDoubleClick={(e) => {
                       e.stopPropagation();
                       setEditingId(s.id);
                     }}
-                    className={`absolute w-44 h-36 p-3 rounded-xl shadow-lg transition-all cursor-grab active:cursor-grabbing font-bold text-xs flex flex-col justify-start ${
-                      isSelected ? 'ring-2 ring-blue-600 scale-105 z-30' : 'z-10'
+                    className={`absolute w-44 h-36 p-3 rounded-xl shadow-lg transition-transform cursor-grab active:cursor-grabbing font-bold text-xs flex flex-col justify-start touch-none ${
+                      isSelected ? 'scale-105 z-30' : 'z-10'
                     }`}
                     style={{
                       left: `${s.x}px`,
@@ -233,6 +247,7 @@ export const InteractiveSandbox: React.FC = () => {
                       borderColor: s.color,
                       borderWidth: '1.5px',
                       color: '#0F172A',
+                      ...activeOutlineStyle,
                     }}
                   >
                     {isEditing ? (
@@ -272,13 +287,13 @@ export const InteractiveSandbox: React.FC = () => {
                 return (
                   <div
                     key={s.id}
-                    onMouseDown={(e) => handleMouseDown(s.id, e)}
+                    onPointerDown={(e) => handlePointerDown(s.id, e)}
                     onDoubleClick={(e) => {
                       e.stopPropagation();
                       setEditingId(s.id);
                     }}
-                    className={`absolute w-36 h-36 rounded-full border-2 font-bold text-xs flex flex-col items-center justify-center text-center p-3 shadow-lg cursor-grab active:cursor-grabbing ${
-                      isSelected ? 'ring-2 ring-blue-600 scale-105 z-30' : 'z-10'
+                    className={`absolute w-36 h-36 rounded-full border-2 font-bold text-xs flex flex-col items-center justify-center text-center p-3 shadow-lg cursor-grab active:cursor-grabbing touch-none ${
+                      isSelected ? 'scale-105 z-30' : 'z-10'
                     }`}
                     style={{
                       left: `${s.x}px`,
@@ -286,6 +301,7 @@ export const InteractiveSandbox: React.FC = () => {
                       borderColor: s.color,
                       backgroundColor: `${s.color}15`,
                       color: s.color,
+                      ...activeOutlineStyle,
                     }}
                   >
                     {isEditing ? (
@@ -320,13 +336,13 @@ export const InteractiveSandbox: React.FC = () => {
               return (
                 <div
                   key={s.id}
-                  onMouseDown={(e) => handleMouseDown(s.id, e)}
+                  onPointerDown={(e) => handlePointerDown(s.id, e)}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
                     setEditingId(s.id);
                   }}
-                  className={`absolute w-48 h-32 rounded-xl border-2 font-bold text-xs flex flex-col justify-start p-3 shadow-lg cursor-grab active:cursor-grabbing ${
-                    isSelected ? 'ring-2 ring-blue-600 scale-105 z-30' : 'z-10'
+                  className={`absolute w-48 h-32 rounded-xl border-2 font-bold text-xs flex flex-col justify-start p-3 shadow-lg cursor-grab active:cursor-grabbing touch-none ${
+                    isSelected ? 'scale-105 z-30' : 'z-10'
                   }`}
                   style={{
                     left: `${s.x}px`,
@@ -334,6 +350,7 @@ export const InteractiveSandbox: React.FC = () => {
                     borderColor: s.color,
                     backgroundColor: `${s.color}15`,
                     color: s.color,
+                    ...activeOutlineStyle,
                   }}
                 >
                   {isEditing ? (
