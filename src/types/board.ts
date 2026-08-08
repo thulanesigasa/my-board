@@ -11,7 +11,16 @@ export type ToolType =
   | 'arrow'
   | 'text'
   | 'stickyNote'
-  | 'eraser';
+  | 'eraser'
+  | 'prototype'
+  | 'diagram'
+  | 'table'
+  | 'timeline'
+  | 'kanban'
+  | 'doc'
+  | 'slides'
+  | 'engage'
+  | 'talktrack';
 
 export interface Point {
   x: number;
@@ -28,7 +37,16 @@ export type ShapeType =
   | 'line'
   | 'arrow'
   | 'text'
-  | 'stickyNote';
+  | 'stickyNote'
+  | 'prototype'
+  | 'diagram'
+  | 'table'
+  | 'timeline'
+  | 'kanban'
+  | 'doc'
+  | 'slides'
+  | 'engage'
+  | 'talktrack';
 
 export interface BaseShape {
   id: string;
@@ -46,6 +64,8 @@ export interface BaseShape {
   updatedAt: number;
   createdBy: string;
   zIndex: number;
+  // Widget-specific data payload
+  widgetData?: Record<string, unknown>;
 }
 
 export interface UserPresence {
