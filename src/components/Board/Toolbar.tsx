@@ -39,8 +39,8 @@ interface ToolbarProps {
 }
 
 const COLOR_PALETTE = [
-  '#2563EB', '#3B82F6', '#0F172A', '#475569', '#EF4444',
-  '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#FFFFFF', '#000000',
+  '#F97316', '#2563EB', '#0F172A', '#475569', '#EF4444',
+  '#F59E0B', '#10B981', '#06B6D4', '#FFFFFF', '#000000',
 ];
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -77,9 +77,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2.5 pointer-events-auto">
       {/* Secondary Customization Bar */}
-      <div className="glass-card px-4 py-2 flex items-center gap-4 text-xs shadow-xl">
+      <div className="glass-card px-4 py-2 flex items-center gap-4 text-xs shadow-xl border border-slate-200">
         <div className="flex items-center gap-2">
-          <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">Color</span>
+          <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider font-mono">Color</span>
           <div className="flex gap-1.5">
             {COLOR_PALETTE.slice(0, 7).map((color) => (
               <button
@@ -87,7 +87,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 onClick={() => setStrokeColor(color)}
                 className={`w-4.5 h-4.5 rounded-full border transition-all ${
                   strokeColor === color
-                    ? 'ring-2 ring-blue-600 scale-125 border-white shadow-md'
+                    ? 'ring-2 ring-orange-500 scale-125 border-white shadow-md'
                     : 'border-slate-300 hover:scale-110 opacity-80 hover:opacity-100'
                 }`}
                 style={{ backgroundColor: color }}
@@ -99,22 +99,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <div className="h-4 w-px bg-slate-200" />
 
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600" />
-          <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">Thickness</span>
+          <SlidersHorizontal className="w-3.5 h-3.5 text-orange-500" />
+          <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider font-mono">Thickness</span>
           <input
             type="range"
             min={2}
             max={24}
             value={strokeWidth}
             onChange={(e) => setStrokeWidth(Number(e.target.value))}
-            className="w-20 accent-blue-600 cursor-pointer"
+            className="w-20 accent-orange-500 cursor-pointer"
           />
           <span className="text-slate-700 font-mono w-4 text-center font-bold">{strokeWidth}</span>
         </div>
       </div>
 
       {/* Main Tool Bar */}
-      <div className="glass-card p-1.5 flex items-center gap-1 shadow-xl">
+      <div className="glass-card p-1.5 flex items-center gap-1 shadow-xl border border-slate-200">
         {tools.map((tool) => {
           const isActive = activeTool === tool.id;
           return (
@@ -124,7 +124,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               title={tool.label}
               className={`p-2 rounded-xl transition-all duration-200 flex items-center justify-center relative ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-md scale-105'
+                  ? 'bg-orange-500 text-white shadow-md scale-105'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -138,7 +138,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button
           onClick={onUndo}
           disabled={!canUndo}
-          title="Undo"
+          title="Undo (Ctrl+Z)"
           className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
         >
           <Undo2 className="w-4 h-4" />
@@ -147,7 +147,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button
           onClick={onRedo}
           disabled={!canRedo}
-          title="Redo"
+          title="Redo (Ctrl+Y)"
           className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
         >
           <Redo2 className="w-4 h-4" />

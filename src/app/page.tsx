@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] relative overflow-hidden font-sans">
       {/* 60-30-10 Ambient Background Reflections */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-blue-600/5 blur-3xl pointer-events-none rounded-full" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-orange-500/5 blur-3xl pointer-events-none rounded-full" />
 
       {/* Floating Sticky Header (Permanently Visible Everywhere on Scroll) */}
       <header className="sticky top-0 z-[100] backdrop-blur-xl bg-white/90 border-b border-slate-200/90 shadow-sm px-6 py-4 transition-all">
@@ -37,17 +37,17 @@ export default function Home() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600 font-body">
-            <a href="#sandbox" className="hover:text-blue-600 transition">Interactive Sandbox</a>
-            <a href="#how-it-works" className="hover:text-blue-600 transition">How It Works</a>
-            <a href="#use-cases" className="hover:text-blue-600 transition">Use Cases</a>
-            <a href="#features" className="hover:text-blue-600 transition">Workbench Engine</a>
-            <a href="#faq" className="hover:text-blue-600 transition">FAQ</a>
+            <a href="#sandbox" className="hover:text-orange-500 transition">Interactive Sandbox</a>
+            <a href="#how-it-works" className="hover:text-orange-500 transition">How It Works</a>
+            <a href="#use-cases" className="hover:text-orange-500 transition">Use Cases</a>
+            <a href="#features" className="hover:text-orange-500 transition">Workbench Engine</a>
+            <a href="#faq" className="hover:text-orange-500 transition">FAQ</a>
           </nav>
 
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-xs font-bold text-slate-700 hover:text-blue-600 transition font-body"
+              className="text-xs font-bold text-slate-700 hover:text-orange-500 transition font-body"
             >
               Sign In
             </Link>
@@ -76,7 +76,7 @@ export default function Home() {
             value={roomInput}
             onChange={(e) => setRoomInput(e.target.value)}
             placeholder="Enter room code or leave blank..."
-            className="flex-1 px-5 py-3.5 rounded-full bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body shadow-sm"
+            className="flex-1 px-5 py-3.5 rounded-full bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs font-body shadow-sm"
           />
           <button type="submit" className="btn-primary text-xs !py-3.5 justify-center shadow-lg font-heading whitespace-nowrap">
             <span>Start Collaborating</span>
@@ -86,13 +86,13 @@ export default function Home() {
         {/* Quick Feature Badges */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-mono">
           <div className="flex items-center gap-1.5">
-            <span className="text-blue-600 font-bold">✓</span> No credit card required
+            <span className="text-orange-500 font-bold">✓</span> No credit card required
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-blue-600 font-bold">✓</span> Native 1-to-1 Pointer Sync Engine
+            <span className="text-orange-500 font-bold">✓</span> Native 1-to-1 Pointer Sync Engine
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-blue-600 font-bold">✓</span> Instant SVG & JSON export
+            <span className="text-orange-500 font-bold">✓</span> Instant SVG & JSON export
           </div>
         </div>
       </section>

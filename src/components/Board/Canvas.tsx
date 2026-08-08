@@ -10,6 +10,8 @@ interface CanvasProps {
   onAddShape: (shape: BaseShape) => void;
   onUpdateShape: (shape: BaseShape) => void;
   onDeleteShape: (shapeId: string) => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
   activeTool: ToolType;
   strokeColor: string;
   fillColor: string;
@@ -25,6 +27,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   onAddShape,
   onUpdateShape,
   onDeleteShape,
+  onUndo,
+  onRedo,
   activeTool,
   strokeColor,
   fillColor,
@@ -44,6 +48,9 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [dragStart, setDragStart] = useState<Point | null>(null);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
 
+  // Clipboard for Copy / Paste
+  const [clipboard, setClipboard] = useState<BaseShape[]>([]);
+
   // Screen coordinates to canvas viewport transformation
   const screenToCanvas = useCallback(
     (screenX: number, screenY: number): Point => {
@@ -56,44 +63,143 @@ export const Canvas: React.FC<CanvasProps> = ({
     [viewport]
   );
 
-  // Synchronize selection changes
+  // Synchronize selection changes with parent
   useEffect(() => {
     onSelectionChange(selectedShapeIds);
   }, [selectedShapeIds, onSelectionChange]);
 
-  // Instant Delete & Backspace Key Deletion Event Listener
+  // Global Keyboard Shortcuts (Ctrl+A, Ctrl+Z, Ctrl+Y, Ctrl+C, Ctrl+V, Ctrl+D, Delete, Escape)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea') return;
 
+      const isCtrl = e.ctrlKey || e.metaKey;
+
+      // Ctrl + A (Select All)
+      if (isCtrl && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        const allIds = shapes.map((s) => s.id);
+        setSelectedShapeIds(allIds);
+        return;
+      }
+
+      // Ctrl + Z (Undo)
+      if (isCtrl && !e.shiftKey && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (onUndo) onUndo();
+        return;
+      }
+
+      // Ctrl + Y or Ctrl + Shift + Z (Redo)
+      if ((isCtrl && e.key.toLowerCase() === 'y') || (isCtrl && e.shiftKey && e.key.toLowerCase() === 'z')) {
+        e.preventDefault();
+        if (onRedo) onRedo();
+        return;
+      }
+
+      // Ctrl + C (Copy)
+      if (isCtrl && e.key.toLowerCase() === 'c' && selectedShapeIds.length > 0) {
+        e.preventDefault();
+        const selectedShapes = shapes.filter((s) => selectedShapeIds.includes(s.id));
+        setClipboard(selectedShapes);
+        return;
+      }
+
+      // Ctrl + V (Paste)
+      if (isCtrl && e.key.toLowerCase() === 'v' && clipboard.length > 0) {
+        e.preventDefault();
+        const newSelectedIds: string[] = [];
+        clipboard.forEach((shape) => {
+          const newId = `shp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+          const pasted: BaseShape = {
+            ...shape,
+            id: newId,
+            x: shape.x + 24,
+            y: shape.y + 24,
+            points: shape.points?.map((p) => ({ x: p.x + 24, y: p.y + 24 })),
+            updatedAt: Date.now(),
+          };
+          onAddShape(pasted);
+          newSelectedIds.push(newId);
+        });
+        setSelectedShapeIds(newSelectedIds);
+        return;
+      }
+
+      // Ctrl + D (Duplicate)
+      if (isCtrl && e.key.toLowerCase() === 'd' && selectedShapeIds.length > 0) {
+        e.preventDefault();
+        const selectedShapes = shapes.filter((s) => selectedShapeIds.includes(s.id));
+        const newSelectedIds: string[] = [];
+        selectedShapes.forEach((shape) => {
+          const newId = `shp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+          const duplicated: BaseShape = {
+            ...shape,
+            id: newId,
+            x: shape.x + 20,
+            y: shape.y + 20,
+            points: shape.points?.map((p) => ({ x: p.x + 20, y: p.y + 20 })),
+            updatedAt: Date.now(),
+          };
+          onAddShape(duplicated);
+          newSelectedIds.push(newId);
+        });
+        setSelectedShapeIds(newSelectedIds);
+        return;
+      }
+
+      // Delete & Backspace (Instant Deletion)
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShapeIds.length > 0) {
         e.preventDefault();
         selectedShapeIds.forEach((id) => onDeleteShape(id));
         setSelectedShapeIds([]);
         setActiveShape(null);
+        return;
+      }
+
+      // Escape (Deselect)
+      if (e.key === 'Escape') {
+        setSelectedShapeIds([]);
+        setActiveShape(null);
+        setEditingTextId(null);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedShapeIds, onDeleteShape]);
+  }, [shapes, selectedShapeIds, clipboard, onAddShape, onDeleteShape, onUndo, onRedo]);
 
-  // Handle pointer down
+  // Handle pointer down (including Ctrl / Shift multi-selection)
   const handlePointerDown = (e: React.PointerEvent) => {
     if (editingTextId) setEditingTextId(null);
 
     const point = screenToCanvas(e.clientX, e.clientY);
+    const isMultiSelectKey = e.ctrlKey || e.shiftKey || e.metaKey;
 
     if (activeTool === 'select') {
       const clickedShape = [...shapes].reverse().find((s) => isPointInShape(point, s));
       if (clickedShape) {
-        setSelectedShapeIds([clickedShape.id]);
+        if (isMultiSelectKey) {
+          // Toggle item in selection array
+          setSelectedShapeIds((prev) =>
+            prev.includes(clickedShape.id)
+              ? prev.filter((id) => id !== clickedShape.id)
+              : [...prev, clickedShape.id]
+          );
+        } else {
+          // Single select
+          if (!selectedShapeIds.includes(clickedShape.id)) {
+            setSelectedShapeIds([clickedShape.id]);
+          }
+        }
         setActiveShape(clickedShape);
         setDragStart(point);
       } else {
-        setSelectedShapeIds([]);
-        setActiveShape(null);
+        if (!isMultiSelectKey) {
+          setSelectedShapeIds([]);
+          setActiveShape(null);
+        }
       }
       return;
     }
@@ -199,15 +305,31 @@ export const Canvas: React.FC<CanvasProps> = ({
       const dx = point.x - dragStart.x;
       const dy = point.y - dragStart.y;
 
-      const updated: BaseShape = {
-        ...activeShape,
-        x: activeShape.x + dx,
-        y: activeShape.y + dy,
-        points: activeShape.points?.map((p) => ({ x: p.x + dx, y: p.y + dy })),
-        updatedAt: Date.now(),
-      };
-      setActiveShape(updated);
-      onUpdateShape(updated);
+      // Update all selected shapes in multi-selection
+      if (selectedShapeIds.length > 1) {
+        shapes.forEach((s) => {
+          if (selectedShapeIds.includes(s.id)) {
+            const updated: BaseShape = {
+              ...s,
+              x: s.x + dx,
+              y: s.y + dy,
+              points: s.points?.map((p) => ({ x: p.x + dx, y: p.y + dy })),
+              updatedAt: Date.now(),
+            };
+            onUpdateShape(updated);
+          }
+        });
+      } else {
+        const updated: BaseShape = {
+          ...activeShape,
+          x: activeShape.x + dx,
+          y: activeShape.y + dy,
+          points: activeShape.points?.map((p) => ({ x: p.x + dx, y: p.y + dy })),
+          updatedAt: Date.now(),
+        };
+        setActiveShape(updated);
+        onUpdateShape(updated);
+      }
       setDragStart(point);
       return;
     }
@@ -260,7 +382,6 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   // Render SVG Shape
   const renderSvgShape = (shape: BaseShape) => {
-    const isSelected = selectedShapeIds.includes(shape.id);
     const bounds = getShapeBounds(shape);
 
     if (shape.type === 'freehand') {
