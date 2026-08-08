@@ -13,7 +13,6 @@ import {
   Target,
   Video,
   ChevronRight,
-  Sparkles,
 } from 'lucide-react';
 
 interface WidgetPickerMenuProps {
@@ -136,10 +135,9 @@ export const WidgetPickerMenu: React.FC<WidgetPickerMenuProps> = ({ onSelectWidg
     <div className="relative inline-block" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="glass-card px-3.5 py-2 hover:border-orange-500/40 text-slate-900 font-bold text-xs transition shadow-md flex items-center gap-2 font-heading bg-white border border-slate-200"
-        title="Interactive Widgets & Tools with Ready Templates"
+        className="glass-card px-4 py-2 hover:border-orange-500/40 text-slate-900 font-bold text-xs transition shadow-sm flex items-center gap-1.5 font-heading bg-white border border-slate-200 rounded-full"
+        title="Interactive Widgets & Tools"
       >
-        <Sparkles className="w-4 h-4 text-orange-500" />
         <span>Interactive Widgets & Tools</span>
       </button>
 

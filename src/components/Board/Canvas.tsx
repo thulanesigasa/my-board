@@ -22,6 +22,22 @@ interface CanvasProps {
   onSelectionChange: (selectedIds: string[]) => void;
 }
 
+interface AlignmentGuide {
+  type: 'h' | 'v';
+  pos: number;
+  start: number;
+  end: number;
+}
+
+interface DistanceGuide {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  distance: number;
+  isVertical: boolean;
+}
+
 export const Canvas: React.FC<CanvasProps> = ({
   shapes,
   onAddShape,
@@ -47,6 +63,10 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [activeShape, setActiveShape] = useState<BaseShape | null>(null);
   const [dragStart, setDragStart] = useState<Point | null>(null);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
+
+  // Smart Alignment & Distance Measurement Overlay States
+  const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuide[]>([]);
+  const [distanceGuides, setDistanceGuides] = useState<DistanceGuide[]>([]);
 
   // Clipboard for Copy / Paste
   const [clipboard, setClipboard] = useState<BaseShape[]>([]);
@@ -215,18 +235,18 @@ export const Canvas: React.FC<CanvasProps> = ({
     ) {
       const newShapeId = `widget_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
       const widgetDefaults: Record<string, { width: number; height: number; text: string }> = {
-        kanban: { width: 440, height: 260, text: 'Sprint Kanban Board' },
-        table: { width: 380, height: 200, text: 'Data Matrix Table' },
-        timeline: { width: 480, height: 180, text: 'Product Roadmap Timeline' },
-        doc: { width: 340, height: 240, text: 'Project Brief Doc' },
-        slides: { width: 420, height: 260, text: 'Pitch Presentation Deck' },
-        prototype: { width: 220, height: 380, text: 'Mobile App Prototype' },
-        diagram: { width: 420, height: 200, text: 'Flowchart Architecture' },
-        engage: { width: 320, height: 220, text: 'Team Engagement Poll' },
-        talktrack: { width: 320, height: 180, text: 'Audio/Video Talktrack' },
+        kanban: { width: 560, height: 280, text: 'Kanban view' },
+        table: { width: 720, height: 280, text: 'Table view' },
+        timeline: { width: 760, height: 320, text: 'Timeline view' },
+        doc: { width: 360, height: 240, text: 'Project Brief Doc' },
+        slides: { width: 440, height: 260, text: 'Pitch Presentation Deck' },
+        prototype: { width: 240, height: 380, text: 'Mobile App Prototype' },
+        diagram: { width: 440, height: 200, text: 'Flowchart Architecture' },
+        engage: { width: 340, height: 220, text: 'Team Engagement Poll' },
+        talktrack: { width: 340, height: 180, text: 'Audio/Video Talktrack' },
       };
 
-      const meta = widgetDefaults[activeTool] || { width: 300, height: 200, text: 'Widget' };
+      const meta = widgetDefaults[activeTool] || { width: 400, height: 240, text: 'Widget' };
       const newWidgetShape: BaseShape = {
         id: newShapeId,
         type: activeTool,
@@ -333,7 +353,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
   };
 
-  // Handle pointer move
+  // Handle pointer move & Smart Alignment Calculation
   const handlePointerMove = (e: React.PointerEvent) => {
     const point = screenToCanvas(e.clientX, e.clientY);
     onCursorMove(point);
@@ -341,6 +361,84 @@ export const Canvas: React.FC<CanvasProps> = ({
     if (activeTool === 'select' && dragStart && activeShape) {
       const dx = point.x - dragStart.x;
       const dy = point.y - dragStart.y;
+
+      const newX = activeShape.x + dx;
+      const newY = activeShape.y + dy;
+      const activeBounds = getShapeBounds({ ...activeShape, x: newX, y: newY });
+
+      // Calculate Smart Alignment Guidelines & Distance Dimensions
+      const newAlignGuides: AlignmentGuide[] = [];
+      const newDistGuides: DistanceGuide[] = [];
+
+      const threshold = 6; // snap threshold in px
+
+      shapes.forEach((other) => {
+        if (other.id === activeShape.id || selectedShapeIds.includes(other.id)) return;
+        const otherBounds = getShapeBounds(other);
+
+        // Horizontal alignment (Top, Center, Bottom)
+        if (Math.abs(activeBounds.y - otherBounds.y) < threshold) {
+          newAlignGuides.push({
+            type: 'h',
+            pos: otherBounds.y,
+            start: Math.min(activeBounds.x, otherBounds.x) - 40,
+            end: Math.max(activeBounds.x + activeBounds.width, otherBounds.x + otherBounds.width) + 40,
+          });
+        }
+        if (Math.abs(activeBounds.y + activeBounds.height - (otherBounds.y + otherBounds.height)) < threshold) {
+          newAlignGuides.push({
+            type: 'h',
+            pos: otherBounds.y + otherBounds.height,
+            start: Math.min(activeBounds.x, otherBounds.x) - 40,
+            end: Math.max(activeBounds.x + activeBounds.width, otherBounds.x + otherBounds.width) + 40,
+          });
+        }
+
+        // Vertical alignment (Left, Center, Right)
+        if (Math.abs(activeBounds.x - otherBounds.x) < threshold) {
+          newAlignGuides.push({
+            type: 'v',
+            pos: otherBounds.x,
+            start: Math.min(activeBounds.y, otherBounds.y) - 40,
+            end: Math.max(activeBounds.y + activeBounds.height, otherBounds.y + otherBounds.height) + 40,
+          });
+        }
+        if (Math.abs(activeBounds.x + activeBounds.width - (otherBounds.x + otherBounds.width)) < threshold) {
+          newAlignGuides.push({
+            type: 'v',
+            pos: otherBounds.x + otherBounds.width,
+            start: Math.min(activeBounds.y, otherBounds.y) - 40,
+            end: Math.max(activeBounds.y + activeBounds.height, otherBounds.y + otherBounds.height) + 40,
+          });
+        }
+
+        // Distance measurement calculations (Screenshot 5: 260px gap indicator)
+        const isHorizontalNeighbor =
+          Math.abs(activeBounds.y + activeBounds.height / 2 - (otherBounds.y + otherBounds.height / 2)) < 100;
+        if (isHorizontalNeighbor) {
+          const gapRight = Math.abs(activeBounds.x - (otherBounds.x + otherBounds.width));
+          const gapLeft = Math.abs(otherBounds.x - (activeBounds.x + activeBounds.width));
+          const dist = Math.round(Math.min(gapRight, gapLeft));
+
+          if (dist > 10 && dist < 600) {
+            const startX = activeBounds.x < otherBounds.x ? activeBounds.x + activeBounds.width : otherBounds.x + otherBounds.width;
+            const endX = activeBounds.x < otherBounds.x ? otherBounds.x : activeBounds.x;
+            const midY = (activeBounds.y + activeBounds.height / 2 + (otherBounds.y + otherBounds.height / 2)) / 2;
+
+            newDistGuides.push({
+              x1: startX,
+              y1: midY,
+              x2: endX,
+              y2: midY,
+              distance: dist,
+              isVertical: false,
+            });
+          }
+        }
+      });
+
+      setAlignmentGuides(newAlignGuides);
+      setDistanceGuides(newDistGuides);
 
       if (selectedShapeIds.length > 1) {
         shapes.forEach((s) => {
@@ -358,8 +456,8 @@ export const Canvas: React.FC<CanvasProps> = ({
       } else {
         const updated: BaseShape = {
           ...activeShape,
-          x: activeShape.x + dx,
-          y: activeShape.y + dy,
+          x: newX,
+          y: newY,
           points: activeShape.points?.map((p) => ({ x: p.x + dx, y: p.y + dy })),
           updatedAt: Date.now(),
         };
@@ -393,6 +491,9 @@ export const Canvas: React.FC<CanvasProps> = ({
   };
 
   const handlePointerUp = () => {
+    setAlignmentGuides([]);
+    setDistanceGuides([]);
+
     if (activeTool === 'select') {
       setDragStart(null);
       return;
@@ -408,6 +509,8 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   const handlePointerLeave = () => {
     onCursorMove(null);
+    setAlignmentGuides([]);
+    setDistanceGuides([]);
     if (isDrawing && activeShape) {
       onAddShape(activeShape);
       setActiveShape(null);
@@ -470,27 +573,73 @@ export const Canvas: React.FC<CanvasProps> = ({
       );
     }
 
-    // 📋 KANBAN BOARD WIDGET RENDERER
+    // 📋 KANBAN BOARD VIEW WIDGET RENDERER (Matching Screenshot 4)
     if (shape.type === 'kanban') {
       return (
         <foreignObject key={shape.id} x={bounds.x} y={bounds.y} width={bounds.width} height={bounds.height}>
-          <div className="w-full h-full bg-white rounded-2xl border border-slate-200 shadow-xl p-3 flex flex-col justify-between font-sans">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
-              <span className="font-extrabold text-xs text-slate-900 font-heading">📋 {shape.text || 'Kanban Board'}</span>
-              <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-mono font-bold text-[9px]">3 Columns</span>
+          <div className="w-full h-full flex flex-col font-sans select-none">
+            {/* Top Floating Card Header */}
+            <div className="flex items-center justify-between bg-white border border-slate-200 shadow-md rounded-2xl px-3 py-1.5 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-extrabold text-[10px]">
+                  📋
+                </span>
+                <span className="font-extrabold text-xs text-slate-900 font-heading">
+                  {shape.text || 'Kanban view'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-400 text-[11px]">
+                <button className="hover:text-slate-700">↗</button>
+                <button className="hover:text-slate-700">⋮</button>
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-2 flex-1 text-[10px]">
-              <div className="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <span className="font-bold text-slate-700 block mb-1">To Do</span>
-                <div className="bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm font-medium">Design System</div>
+
+            {/* Action Bar & Columns Box */}
+            <div className="w-full flex-1 bg-white rounded-2xl border border-slate-200 shadow-xl p-3 flex flex-col justify-between">
+              {/* Top Action Bar Icons */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold text-[10px] font-mono flex items-center gap-1">
+                    ↻ Synced
+                  </span>
+                  <span className="text-slate-400 font-mono text-[10px]">⊞ ⊟ ⬚ ⚙ 🔍</span>
+                </div>
               </div>
-              <div className="bg-orange-50/50 p-2 rounded-xl border border-orange-200">
-                <span className="font-bold text-orange-700 block mb-1">In Progress</span>
-                <div className="bg-white p-1.5 rounded-lg border border-orange-200 shadow-sm font-medium">CRDT Sync Engine</div>
-              </div>
-              <div className="bg-emerald-50/50 p-2 rounded-xl border border-emerald-200">
-                <span className="font-bold text-emerald-700 block mb-1">Done</span>
-                <div className="bg-white p-1.5 rounded-lg border border-emerald-200 shadow-sm font-medium">120Hz Bezier Ink</div>
+
+              {/* Kanban Status Columns */}
+              <div className="grid grid-cols-3 gap-3 flex-1 text-[11px]">
+                {/* Not Started Column */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-bold text-[10px]">
+                      Not Started
+                    </span>
+                    <span className="text-slate-400 font-mono text-[10px]">1</span>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm font-medium text-slate-400 text-[10px]">
+                    Type something...
+                  </div>
+                </div>
+
+                {/* In Progress Column */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded bg-blue-500 text-white font-bold text-[10px]">
+                      In Progress
+                    </span>
+                    <span className="text-slate-400 font-mono text-[10px]">0</span>
+                  </div>
+                </div>
+
+                {/* Complete Column */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded bg-emerald-500 text-white font-bold text-[10px]">
+                      Complete
+                    </span>
+                    <span className="text-slate-400 font-mono text-[10px]">0</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -498,61 +647,161 @@ export const Canvas: React.FC<CanvasProps> = ({
       );
     }
 
-    // 📊 DATA TABLE WIDGET RENDERER
+    // 📊 TABLE VIEW DATA GRID WIDGET RENDERER (Matching Screenshot 3)
     if (shape.type === 'table') {
       return (
         <foreignObject key={shape.id} x={bounds.x} y={bounds.y} width={bounds.width} height={bounds.height}>
-          <div className="w-full h-full bg-white rounded-2xl border border-slate-200 shadow-xl p-3 flex flex-col font-sans">
-            <div className="font-extrabold text-xs text-slate-900 font-heading mb-2 border-b border-slate-100 pb-1">
-              📊 {shape.text || 'Data Matrix Table'}
+          <div className="w-full h-full flex flex-col font-sans select-none">
+            {/* Top Floating Card Header */}
+            <div className="flex items-center justify-between bg-white border border-slate-200 shadow-md rounded-2xl px-3 py-1.5 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-extrabold text-[10px]">
+                  📊
+                </span>
+                <span className="font-extrabold text-xs text-slate-900 font-heading">
+                  {shape.text || 'Table view'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-400 text-[11px]">
+                <button className="hover:text-slate-700">↗</button>
+                <button className="hover:text-slate-700">⋮</button>
+              </div>
             </div>
-            <table className="w-full text-left text-[10px] border-collapse">
-              <thead>
-                <tr className="bg-slate-100 text-slate-700 font-bold font-mono">
-                  <th className="p-1.5 border border-slate-200">Feature</th>
-                  <th className="p-1.5 border border-slate-200">Status</th>
-                  <th className="p-1.5 border border-slate-200">Priority</th>
-                </tr>
-              </thead>
-              <tbody className="font-medium text-slate-600">
-                <tr>
-                  <td className="p-1.5 border border-slate-200">WebSocket Sync</td>
-                  <td className="p-1.5 border border-slate-200 text-emerald-600 font-bold">Active</td>
-                  <td className="p-1.5 border border-slate-200 text-orange-500 font-bold">High</td>
-                </tr>
-                <tr>
-                  <td className="p-1.5 border border-slate-200">SVG Export</td>
-                  <td className="p-1.5 border border-slate-200 text-emerald-600 font-bold">Ready</td>
-                  <td className="p-1.5 border border-slate-200">Normal</td>
-                </tr>
-              </tbody>
-            </table>
+
+            {/* Action Bar & Data Grid Table */}
+            <div className="w-full flex-1 bg-white rounded-2xl border border-slate-200 shadow-xl p-3 flex flex-col justify-between overflow-x-auto">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold text-[10px] font-mono flex items-center gap-1">
+                    ↻ Synced
+                  </span>
+                  <span className="text-slate-400 font-mono text-[10px]">⊞ ⊟ ⬚ ⚙ 🔍</span>
+                </div>
+              </div>
+
+              <table className="w-full text-left text-[10px] border-collapse min-w-[650px]">
+                <thead>
+                  <tr className="text-slate-500 font-medium font-body border-b border-slate-200">
+                    <th className="w-8 p-1.5 text-center text-slate-300">#</th>
+                    <th className="p-1.5 font-semibold">🔖 Title</th>
+                    <th className="p-1.5 font-semibold">≡ Description</th>
+                    <th className="p-1.5 font-semibold">⏱ Status</th>
+                    <th className="p-1.5 font-semibold">👤 Assignee</th>
+                    <th className="p-1.5 font-semibold">📅 Start Date</th>
+                    <th className="p-1.5 font-semibold">📅 End Date</th>
+                    <th className="p-1.5 font-semibold"># Estimate</th>
+                    <th className="p-1.5 font-semibold">⚡ Priority</th>
+                    <th className="w-6 p-1.5 text-slate-400">+</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                  <tr>
+                    <td className="p-1.5 text-center text-slate-400">1</td>
+                    <td className="p-1.5 font-bold text-slate-900">Sprint Backlog</td>
+                    <td className="p-1.5 text-slate-500">Collaborative whiteboard engine</td>
+                    <td className="p-1.5"><span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[9px]">Active</span></td>
+                    <td className="p-1.5">Thulane</td>
+                    <td className="p-1.5 text-slate-400">Aug 8</td>
+                    <td className="p-1.5 text-slate-400">Aug 15</td>
+                    <td className="p-1.5 font-mono">5d</td>
+                    <td className="p-1.5"><span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 font-bold text-[9px]">High</span></td>
+                    <td />
+                  </tr>
+                  <tr>
+                    <td className="p-1.5 text-center text-slate-400">2</td>
+                    <td className="p-1.5 border border-blue-400 bg-blue-50/30 rounded" />
+                    <td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td />
+                  </tr>
+                  <tr><td className="p-1.5 text-center text-slate-400">3</td><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td /></tr>
+                  <tr><td className="p-1.5 text-center text-slate-400">4</td><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td /></tr>
+                  <tr><td className="p-1.5 text-center text-slate-400">5</td><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td className="p-1.5" /><td /></tr>
+                </tbody>
+              </table>
+              <div className="pt-2 text-slate-400 text-xs font-bold font-mono hover:text-slate-700 cursor-pointer">+ Add row</div>
+            </div>
           </div>
         </foreignObject>
       );
     }
 
-    // ⏳ ROADMAP TIMELINE WIDGET RENDERER
+    // ⏳ GANTT CHART TIMELINE ROADMAP WIDGET RENDERER (Matching Screenshot 2)
     if (shape.type === 'timeline') {
       return (
         <foreignObject key={shape.id} x={bounds.x} y={bounds.y} width={bounds.width} height={bounds.height}>
-          <div className="w-full h-full bg-white rounded-2xl border border-slate-200 shadow-xl p-3 flex flex-col justify-between font-sans">
-            <div className="font-extrabold text-xs text-slate-900 font-heading mb-2 border-b border-slate-100 pb-1">
-              ⏳ {shape.text || 'Product Roadmap Timeline'}
+          <div className="w-full h-full flex flex-col font-sans select-none">
+            {/* Top Floating Card Header */}
+            <div className="flex items-center justify-between bg-white border border-slate-200 shadow-md rounded-2xl px-3 py-1.5 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-lg bg-green-600 text-white flex items-center justify-center font-extrabold text-[10px]">
+                  ⏳
+                </span>
+                <span className="font-extrabold text-xs text-slate-900 font-heading">
+                  {shape.text || 'Timeline view'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-400 text-[11px]">
+                <button className="hover:text-slate-700">↗</button>
+                <button className="hover:text-slate-700">⋮</button>
+              </div>
             </div>
-            <div className="flex items-center justify-between relative px-4">
-              <div className="absolute top-1/2 left-4 right-4 h-1 bg-slate-200 -translate-y-1/2 z-0" />
-              <div className="relative z-10 text-center bg-white px-2">
-                <span className="w-4 h-4 rounded-full bg-orange-500 text-white font-extrabold text-[9px] flex items-center justify-center mx-auto mb-1">1</span>
-                <span className="text-[10px] font-bold text-slate-800 block">Q1 Ink</span>
+
+            {/* Gantt Timeline Container */}
+            <div className="w-full flex-1 bg-white rounded-2xl border border-slate-200 shadow-xl p-3 flex flex-col overflow-x-auto">
+              {/* Action Bar & Controls */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px]">Weeks ˅</span>
+                  <span className="text-slate-400 font-mono text-[10px]">📅 ↔</span>
+                </div>
+                <div className="flex items-center gap-6 text-[10px] font-bold text-slate-400">
+                  <span>August</span>
+                  <span>September</span>
+                  <span>October</span>
+                </div>
               </div>
-              <div className="relative z-10 text-center bg-white px-2">
-                <span className="w-4 h-4 rounded-full bg-orange-500 text-white font-extrabold text-[9px] flex items-center justify-center mx-auto mb-1">2</span>
-                <span className="text-[10px] font-bold text-slate-800 block">Q2 CRDT</span>
+
+              {/* Gantt Grid Header Dates */}
+              <div className="grid grid-cols-12 gap-1 text-[9px] font-mono text-slate-400 border-b border-slate-100 pb-1 mb-2 text-center">
+                <div className="col-span-3 text-left font-bold text-slate-600 px-1">3 records</div>
+                <div>8</div><div>10</div><div>17</div><div>24</div><div>31</div><div>7</div><div>14</div><div>21</div><div>28</div>
               </div>
-              <div className="relative z-10 text-center bg-white px-2">
-                <span className="w-4 h-4 rounded-full bg-slate-300 text-white font-extrabold text-[9px] flex items-center justify-center mx-auto mb-1">3</span>
-                <span className="text-[10px] font-bold text-slate-500 block">Q3 Export</span>
+
+              {/* Task Rows & Yellow Gantt Bars */}
+              <div className="space-y-3 relative text-[10px]">
+                {/* Dotted "Today" Marker Line */}
+                <div className="absolute top-0 bottom-0 left-[28%] border-l-2 border-dashed border-slate-400 z-10 flex flex-col items-center">
+                  <span className="text-[8px] font-bold bg-slate-800 text-white px-1 rounded -mt-2">Today</span>
+                </div>
+
+                {/* Row 1: First task */}
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3 font-semibold text-slate-700">First task</div>
+                  <div className="col-span-9 relative h-7">
+                    <div className="absolute left-[5%] width-[45%] w-44 h-6 bg-amber-100/90 border border-amber-300 rounded-md px-2.5 py-1 text-slate-800 font-bold text-[9px] shadow-sm flex items-center">
+                      First task
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Second task */}
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3 font-semibold text-slate-700">Second task</div>
+                  <div className="col-span-9 relative h-7">
+                    <div className="absolute left-[25%] width-[45%] w-48 h-6 bg-amber-100/90 border border-amber-300 rounded-md px-2.5 py-1 text-slate-800 font-bold text-[9px] shadow-sm flex items-center">
+                      Second task
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 3: Third task */}
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3 font-semibold text-slate-700">Third task</div>
+                  <div className="col-span-9 relative h-7">
+                    <div className="absolute left-[45%] width-[50%] w-52 h-6 bg-amber-100/90 border border-amber-300 rounded-md px-2.5 py-1 text-slate-800 font-bold text-[9px] shadow-sm flex items-center">
+                      Third task
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -850,6 +1099,52 @@ export const Canvas: React.FC<CanvasProps> = ({
         <g transform={`translate(${viewport.x}, ${viewport.y}) scale(${viewport.zoom})`}>
           {shapes.map((shape) => renderSvgShape(shape))}
           {activeShape && renderSvgShape(activeShape)}
+
+          {/* Smart Alignment Dashed Blue Guidelines (Screenshot 5 & Miro Link) */}
+          {alignmentGuides.map((guide, idx) => (
+            <line
+              key={`guide_${idx}`}
+              x1={guide.type === 'h' ? guide.start : guide.pos}
+              y1={guide.type === 'h' ? guide.pos : guide.start}
+              x2={guide.type === 'h' ? guide.end : guide.pos}
+              y2={guide.type === 'h' ? guide.pos : guide.end}
+              stroke="#3b82f6"
+              strokeWidth={1.5}
+              strokeDasharray="4 4"
+            />
+          ))}
+
+          {/* Realtime Distance Dimension Measurement Indicators (Screenshot 5: 260px gap indicator) */}
+          {distanceGuides.map((dist, idx) => (
+            <g key={`dist_${idx}`}>
+              <line x1={dist.x1} y1={dist.y1} x2={dist.x2} y2={dist.y2} stroke="#3b82f6" strokeWidth={1.5} />
+              {/* Left & Right End Ticks */}
+              <line x1={dist.x1} y1={dist.y1 - 6} x2={dist.x1} y2={dist.y1 + 6} stroke="#3b82f6" strokeWidth={2} />
+              <line x1={dist.x2} y1={dist.y2 - 6} x2={dist.x2} y2={dist.y2 + 6} stroke="#3b82f6" strokeWidth={2} />
+              {/* Distance Pixel Text Badge */}
+              <rect
+                x={(dist.x1 + dist.x2) / 2 - 18}
+                y={(dist.y1 + dist.y2) / 2 - 10}
+                width={36}
+                height={20}
+                fill="#ffffff"
+                stroke="#3b82f6"
+                strokeWidth={1}
+                rx={4}
+              />
+              <text
+                x={(dist.x1 + dist.x2) / 2}
+                y={(dist.y1 + dist.y2) / 2 + 4}
+                textAnchor="middle"
+                fill="#2563eb"
+                fontSize={11}
+                fontWeight="800"
+                fontFamily="var(--font-heading)"
+              >
+                {dist.distance}
+              </text>
+            </g>
+          ))}
 
           {/* Selection Bounding Box */}
           {selectedShapeIds.map((id) => {
