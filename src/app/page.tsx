@@ -11,7 +11,6 @@ import { UseCaseShowcase } from '@/components/landing/UseCaseShowcase';
 import { FeatureSuperpowerMatrix } from '@/components/landing/FeatureSuperpowerMatrix';
 import { ComparisonMatrix } from '@/components/landing/ComparisonMatrix';
 import { FaqAccordion } from '@/components/landing/FaqAccordion';
-import { TransparentHeroVideo } from '@/components/landing/TransparentHeroVideo';
 import { Footer } from '@/components/Footer';
 
 export default function Home() {
@@ -58,43 +57,46 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 1. Split Hero Section (Frameless Transparent Keyed Video) */}
-      <section className="relative pt-16 pb-20 px-6 max-w-7xl mx-auto text-left z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Text & Launch Form (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.15] font-heading tracking-tight">
-              Collaborative Whiteboarding <br />
-              <span className="gradient-text">Built For Modern Teams</span>
-            </h1>
+      {/* 1. Centered Hero Section (Pill Badge & Video Removed) */}
+      <section className="relative pt-24 pb-16 px-6 max-w-5xl mx-auto text-center z-10 flex flex-col items-center">
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-[1.15] font-heading tracking-tight mb-6">
+          Collaborative Whiteboarding <br />
+          <span className="gradient-text">Built For Modern Teams</span>
+        </h1>
 
-            <p className="text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed font-body">
-              Draw smooth Bezier pressure ink, create vector shapes, write sticky notes, and stream multi-user cursor tags in real-time with Last-Write-Wins CRDT sync.
-            </p>
+        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-body mb-10">
+          Draw smooth Bezier pressure ink, create vector shapes, write sticky notes, and stream multi-user cursor tags in real-time with Last-Write-Wins CRDT sync.
+        </p>
 
-            {/* Room Launch Form */}
-            <form onSubmit={handleLaunch} className="flex flex-col sm:flex-row gap-3 pt-2 max-w-md">
-              <input
-                type="text"
-                value={roomInput}
-                onChange={(e) => setRoomInput(e.target.value)}
-                placeholder="Enter room code or leave blank..."
-                className="flex-1 px-5 py-3.5 rounded-full bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body shadow-sm"
-              />
-              <button type="submit" className="btn-primary text-xs !py-3.5 justify-center shadow-lg font-heading">
-                <span>Start Collaborating</span>
-              </button>
-            </form>
+        {/* Room Launch Form */}
+        <form onSubmit={handleLaunch} className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto mb-8">
+          <input
+            type="text"
+            value={roomInput}
+            onChange={(e) => setRoomInput(e.target.value)}
+            placeholder="Enter room code or leave blank..."
+            className="flex-1 px-5 py-3.5 rounded-full bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs font-body shadow-sm"
+          />
+          <button type="submit" className="btn-primary text-xs !py-3.5 justify-center shadow-lg font-heading whitespace-nowrap">
+            <span>Start Collaborating</span>
+          </button>
+        </form>
+
+        {/* Quick Feature Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-mono">
+          <div className="flex items-center gap-1.5">
+            <span className="text-blue-600 font-bold">✓</span> No credit card required
           </div>
-
-          {/* Right Column: Transparent Keyed Video Output (5 Cols) */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
-            <TransparentHeroVideo src="/vid/hero.mp4" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-blue-600 font-bold">✓</span> 120Hz High-Refresh Canvas
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-blue-600 font-bold">✓</span> Instant SVG & JSON export
           </div>
         </div>
       </section>
 
-      {/* 2. Authentic Tech Specs Bar */}
+      {/* 2. Authentic Tech Specs & Data Metric Bar */}
       <TrustStatsBar />
 
       {/* 3. Interactive Sandbox Demo */}

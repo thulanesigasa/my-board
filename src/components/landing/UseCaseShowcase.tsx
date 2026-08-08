@@ -7,18 +7,24 @@ export const UseCaseShowcase: React.FC = () => {
 
   const useCases = {
     brainstorm: {
+      number: '01',
+      stepTag: '01 / WIREFRAMING & UX',
       title: 'UX/UI Brainstorming & Wireframes',
       description: 'Map out user journeys, sticky notes, and freehand pressure wireframes simultaneously with your design team.',
       highlights: ['120Hz freehand smooth stroke ink', 'Color-coded sticky notes', 'Live multiplayer cursor tags'],
       mockup: 'UX Wireframe & Journey Map Session',
     },
     architecture: {
+      number: '02',
+      stepTag: '02 / SYSTEM ARCHITECTURE',
       title: 'Software System Architecture & WebSockets',
       description: 'Diagram complex cloud microservices, database schemas, and Socket.IO real-time event streaming flows.',
       highlights: ['Vector Rectangles & Arrows', 'Supabase PostgreSQL persistence', 'Export SVG vector diagrams'],
       mockup: 'Microservices & Database Architecture',
     },
     sprint: {
+      number: '03',
+      stepTag: '03 / AGILE SPRINT',
       title: 'Agile Sprint Planning & Retrospectives',
       description: 'Organize sprint backlogs, feature prioritization grids, and retrospective feedback cards with your agile team.',
       highlights: ['Drag & drop state sync', 'Conflict-free LWW engine', 'Unlimited room sessions'],
@@ -72,19 +78,27 @@ export const UseCaseShowcase: React.FC = () => {
           </button>
         </div>
 
-        {/* Display Card */}
-        <div className="glass-card p-8 text-left shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-extrabold text-slate-900 font-heading">
+        {/* Bento Display Card inspired by makemynotes */}
+        <div className="group relative glass-card p-8 sm:p-10 text-left shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto border border-slate-200/80 rounded-3xl overflow-hidden hover:shadow-blue-500/10 transition-all duration-300">
+          {/* Watermark Step Number from makemynotes */}
+          <div className="absolute -right-4 -top-8 text-[12rem] font-black text-slate-900/[0.03] select-none pointer-events-none leading-none font-heading">
+            {current.number}
+          </div>
+
+          <div className="space-y-4 relative z-10">
+            <p className="text-xs font-bold tracking-widest text-blue-600 uppercase font-mono">
+              {current.stepTag}
+            </p>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-heading">
               {current.title}
             </h3>
-            <p className="text-xs text-slate-600 leading-relaxed font-body">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-body">
               {current.description}
             </p>
 
-            <div className="pt-2 space-y-2">
+            <div className="pt-2 space-y-2.5">
               {current.highlights.map((h, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs font-semibold text-slate-800 font-body">
+                <div key={i} className="flex items-center gap-2.5 text-xs font-semibold text-slate-800 font-body">
                   <span className="w-2 h-2 rounded-full bg-blue-600" />
                   <span>{h}</span>
                 </div>
@@ -92,7 +106,7 @@ export const UseCaseShowcase: React.FC = () => {
             </div>
           </div>
 
-          <div className="h-64 rounded-2xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between text-white relative overflow-hidden shadow-inner">
+          <div className="h-64 rounded-2xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between text-white relative z-10 overflow-hidden shadow-inner">
             <div className="text-xs font-bold font-mono text-blue-400 uppercase tracking-wider">
               {current.mockup}
             </div>

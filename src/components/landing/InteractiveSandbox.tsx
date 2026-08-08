@@ -99,6 +99,14 @@ export const InteractiveSandbox: React.FC = () => {
     draggingIdRef.current = null;
   };
 
+  // Deactivate active shapes when double-clicking or single-clicking on empty background
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    if (e.target === containerRef.current || (e.target as HTMLElement).classList.contains('canvas-grid-bg')) {
+      setSelectedId(null);
+      setEditingId(null);
+    }
+  };
+
   const updateSelectedColor = (color: string) => {
     if (selectedId === null) return;
     setShapes((prev) => prev.map((s) => (s.id === selectedId ? { ...s, color } : s)));
@@ -123,7 +131,7 @@ export const InteractiveSandbox: React.FC = () => {
           Try The Live Interactive Canvas Sandbox
         </h2>
         <p className="text-slate-600 text-sm max-w-xl mx-auto mb-10 leading-relaxed font-body">
-          Drag shapes around, double-click to edit BOTH title & multiline body text underneath, and pick colors from the palette.
+          Drag shapes around, double-click to edit title & multiline body text, and pick colors from the palette.
         </p>
 
         {/* Sandbox Glass Container */}
@@ -193,12 +201,14 @@ export const InteractiveSandbox: React.FC = () => {
           {/* Interactive Drag & Drop Canvas */}
           <div
             ref={containerRef}
+            onClick={handleBackgroundClick}
+            onDoubleClick={handleBackgroundClick}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className="h-96 rounded-2xl bg-white border border-slate-200 relative overflow-hidden shadow-inner select-none cursor-crosshair"
+            className="canvas-grid-bg h-96 rounded-2xl bg-white border border-slate-200 relative overflow-hidden shadow-inner select-none cursor-crosshair"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] opacity-60" />
+            <div className="canvas-grid-bg absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] opacity-60 pointer-events-none" />
 
             {shapes.map((s) => {
               const isSelected = selectedId === s.id;
@@ -209,8 +219,11 @@ export const InteractiveSandbox: React.FC = () => {
                   <div
                     key={s.id}
                     onMouseDown={(e) => handleMouseDown(s.id, e)}
-                    onDoubleClick={() => setEditingId(s.id)}
-                    className={`absolute w-44 h-36 p-3 rounded-xl shadow-lg transition-shadow cursor-grab active:cursor-grabbing font-bold text-xs flex flex-col justify-between ${
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      setEditingId(s.id);
+                    }}
+                    className={`absolute w-44 h-36 p-3 rounded-xl shadow-lg transition-all cursor-grab active:cursor-grabbing font-bold text-xs flex flex-col justify-start ${
                       isSelected ? 'ring-2 ring-blue-600 scale-105 z-30' : 'z-10'
                     }`}
                     style={{
@@ -223,39 +236,34 @@ export const InteractiveSandbox: React.FC = () => {
                     }}
                   >
                     {isEditing ? (
-                      <div className="space-y-1 w-full" onClick={(e) => e.stopPropagation()}>
+                      <div className="space-y-1 w-full h-full flex flex-col" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="text"
+                          autoFocus
                           value={s.title}
                           onChange={(e) => updateSelectedTitle(e.target.value)}
-                          placeholder="Heading..."
-                          className="bg-white/90 w-full text-xs font-black p-1 rounded border border-amber-300 focus:outline-none"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') setEditingId(null);
+                          }}
+                          className="w-full bg-transparent font-extrabold text-xs text-slate-900 border-b border-amber-300/60 focus:outline-none pb-1 font-heading"
                         />
                         <textarea
-                          rows={2}
+                          rows={3}
                           value={s.bodyText}
                           onChange={(e) => updateSelectedBody(e.target.value)}
-                          placeholder="Body text below heading..."
-                          className="bg-white/90 w-full text-[10px] p-1 rounded border border-amber-300 focus:outline-none resize-none"
+                          className="w-full bg-transparent text-[10px] text-slate-700 font-normal leading-tight focus:outline-none resize-none flex-1 font-body pt-1"
                         />
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="w-full py-0.5 bg-amber-400 text-[9px] font-bold rounded text-slate-900"
-                        >
-                          Done
-                        </button>
                       </div>
                     ) : (
-                      <div>
-                        <h4 className="font-extrabold text-xs text-slate-900 mb-1 border-b border-amber-300/40 pb-1">
+                      <div className="w-full h-full flex flex-col">
+                        <h4 className="font-extrabold text-xs text-slate-900 mb-1 border-b border-amber-300/40 pb-1 font-heading">
                           {s.title}
                         </h4>
-                        <p className="text-[10px] text-slate-700 font-normal leading-tight font-body">
+                        <p className="text-[10px] text-slate-700 font-normal leading-tight font-body flex-1">
                           {s.bodyText}
                         </p>
                       </div>
                     )}
-                    <span className="text-[9px] font-mono opacity-50 text-right block mt-1">Double-click to edit</span>
                   </div>
                 );
               }
@@ -265,7 +273,10 @@ export const InteractiveSandbox: React.FC = () => {
                   <div
                     key={s.id}
                     onMouseDown={(e) => handleMouseDown(s.id, e)}
-                    onDoubleClick={() => setEditingId(s.id)}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      setEditingId(s.id);
+                    }}
                     className={`absolute w-36 h-36 rounded-full border-2 font-bold text-xs flex flex-col items-center justify-center text-center p-3 shadow-lg cursor-grab active:cursor-grabbing ${
                       isSelected ? 'ring-2 ring-blue-600 scale-105 z-30' : 'z-10'
                     }`}
@@ -278,32 +289,28 @@ export const InteractiveSandbox: React.FC = () => {
                     }}
                   >
                     {isEditing ? (
-                      <div className="space-y-1 w-24" onClick={(e) => e.stopPropagation()}>
+                      <div className="space-y-1 w-28 text-center" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="text"
+                          autoFocus
                           value={s.title}
                           onChange={(e) => updateSelectedTitle(e.target.value)}
-                          placeholder="Heading"
-                          className="bg-white/90 text-[10px] font-bold p-1 rounded border focus:outline-none w-full text-center"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') setEditingId(null);
+                          }}
+                          className="w-full bg-transparent font-extrabold text-xs text-slate-900 focus:outline-none text-center font-heading border-b border-current/20 pb-0.5"
                         />
                         <textarea
                           rows={2}
                           value={s.bodyText}
                           onChange={(e) => updateSelectedBody(e.target.value)}
-                          placeholder="Body text"
-                          className="bg-white/90 text-[9px] p-1 rounded border focus:outline-none w-full text-center resize-none"
+                          className="w-full bg-transparent text-[9px] text-slate-700 font-normal leading-tight focus:outline-none text-center resize-none font-body pt-1"
                         />
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="w-full py-0.5 bg-blue-600 text-white text-[8px] font-bold rounded"
-                        >
-                          Done
-                        </button>
                       </div>
                     ) : (
-                      <div>
-                        <h4 className="font-extrabold text-xs mb-0.5">{s.title}</h4>
-                        <p className="text-[9px] font-normal opacity-80 line-clamp-2">{s.bodyText}</p>
+                      <div className="w-full">
+                        <h4 className="font-extrabold text-xs text-slate-900 mb-0.5 font-heading">{s.title}</h4>
+                        <p className="text-[9px] text-slate-700 font-normal opacity-90 line-clamp-2 font-body">{s.bodyText}</p>
                       </div>
                     )}
                   </div>
@@ -314,8 +321,11 @@ export const InteractiveSandbox: React.FC = () => {
                 <div
                   key={s.id}
                   onMouseDown={(e) => handleMouseDown(s.id, e)}
-                  onDoubleClick={() => setEditingId(s.id)}
-                  className={`absolute w-48 h-32 rounded-xl border-2 font-bold text-xs flex flex-col justify-between p-3 shadow-lg cursor-grab active:cursor-grabbing ${
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    setEditingId(s.id);
+                  }}
+                  className={`absolute w-48 h-32 rounded-xl border-2 font-bold text-xs flex flex-col justify-start p-3 shadow-lg cursor-grab active:cursor-grabbing ${
                     isSelected ? 'ring-2 ring-blue-600 scale-105 z-30' : 'z-10'
                   }`}
                   style={{
@@ -327,35 +337,30 @@ export const InteractiveSandbox: React.FC = () => {
                   }}
                 >
                   {isEditing ? (
-                    <div className="space-y-1 w-full" onClick={(e) => e.stopPropagation()}>
+                    <div className="space-y-1 w-full h-full flex flex-col" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="text"
+                        autoFocus
                         value={s.title}
                         onChange={(e) => updateSelectedTitle(e.target.value)}
-                        placeholder="Heading..."
-                        className="bg-white/90 w-full text-xs font-bold p-1 rounded border focus:outline-none text-slate-900"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') setEditingId(null);
+                        }}
+                        className="w-full bg-transparent font-extrabold text-xs text-slate-900 border-b border-current/20 focus:outline-none pb-1 font-heading"
                       />
                       <textarea
                         rows={2}
                         value={s.bodyText}
                         onChange={(e) => updateSelectedBody(e.target.value)}
-                        placeholder="Body text below heading..."
-                        className="bg-white/90 w-full text-[10px] p-1 rounded border focus:outline-none resize-none text-slate-900"
+                        className="w-full bg-transparent text-[10px] text-slate-700 font-normal leading-tight focus:outline-none resize-none flex-1 font-body pt-1"
                       />
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="w-full py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded"
-                      >
-                        Done Editing
-                      </button>
                     </div>
                   ) : (
-                    <div>
-                      <h4 className="font-extrabold text-xs mb-1 border-b border-current/20 pb-1">{s.title}</h4>
-                      <p className="text-[10px] font-normal opacity-90 leading-tight">{s.bodyText}</p>
+                    <div className="w-full h-full flex flex-col">
+                      <h4 className="font-extrabold text-xs text-slate-900 mb-1 border-b border-current/20 pb-1 font-heading">{s.title}</h4>
+                      <p className="text-[10px] text-slate-700 font-normal opacity-90 leading-tight font-body flex-1">{s.bodyText}</p>
                     </div>
                   )}
-                  <span className="text-[8px] font-mono opacity-50 text-right block">Double-click to edit</span>
                 </div>
               );
             })}
