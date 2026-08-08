@@ -11,6 +11,7 @@ import { UseCaseShowcase } from '@/components/landing/UseCaseShowcase';
 import { FeatureSuperpowerMatrix } from '@/components/landing/FeatureSuperpowerMatrix';
 import { ComparisonMatrix } from '@/components/landing/ComparisonMatrix';
 import { FaqAccordion } from '@/components/landing/FaqAccordion';
+import { ScrollButtons } from '@/components/ScrollButtons';
 import { Footer } from '@/components/Footer';
 
 export default function Home() {
@@ -28,8 +29,8 @@ export default function Home() {
       {/* 60-30-10 Ambient Background Reflections */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-blue-600/5 blur-3xl pointer-events-none rounded-full" />
 
-      {/* Floating Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200/80 px-6 py-4 transition-all">
+      {/* Floating Sticky Header (Permanently Visible Everywhere on Scroll) */}
+      <header className="sticky top-0 z-[100] backdrop-blur-xl bg-white/90 border-b border-slate-200/90 shadow-sm px-6 py-4 transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-xl font-extrabold tracking-tight text-slate-900 font-heading">
             my-board
@@ -57,7 +58,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 1. Centered Hero Section (Pill Badge & Video Removed) */}
+      {/* 1. Centered Hero Section */}
       <section className="relative pt-24 pb-16 px-6 max-w-5xl mx-auto text-center z-10 flex flex-col items-center">
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-[1.15] font-heading tracking-tight mb-6">
           Collaborative Whiteboarding <br />
@@ -88,7 +89,7 @@ export default function Home() {
             <span className="text-blue-600 font-bold">✓</span> No credit card required
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-blue-600 font-bold">✓</span> 120Hz High-Refresh Canvas
+            <span className="text-blue-600 font-bold">✓</span> Native 1-to-1 Pointer Sync Engine
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-blue-600 font-bold">✓</span> Instant SVG & JSON export
@@ -133,6 +134,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Floating Scroll-to-Top and Scroll-to-Bottom Action Buttons */}
+      <ScrollButtons />
 
       {/* 10. Portflio-Style Multi-Column Footer */}
       <Footer />

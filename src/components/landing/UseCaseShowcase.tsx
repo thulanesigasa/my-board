@@ -50,8 +50,8 @@ export const UseCaseShowcase: React.FC = () => {
             onClick={() => setActiveTab('brainstorm')}
             className={`px-5 py-2.5 rounded-full text-xs font-bold transition ${
               activeTab === 'brainstorm'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'glass-card text-slate-700 hover:border-blue-500/40'
+                ? 'bg-blue-600 text-white shadow'
+                : 'glass-card text-slate-700 hover:border-slate-300'
             }`}
           >
             UX Brainstorming
@@ -60,8 +60,8 @@ export const UseCaseShowcase: React.FC = () => {
             onClick={() => setActiveTab('architecture')}
             className={`px-5 py-2.5 rounded-full text-xs font-bold transition ${
               activeTab === 'architecture'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'glass-card text-slate-700 hover:border-blue-500/40'
+                ? 'bg-blue-600 text-white shadow'
+                : 'glass-card text-slate-700 hover:border-slate-300'
             }`}
           >
             System Architecture
@@ -70,8 +70,8 @@ export const UseCaseShowcase: React.FC = () => {
             onClick={() => setActiveTab('sprint')}
             className={`px-5 py-2.5 rounded-full text-xs font-bold transition ${
               activeTab === 'sprint'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'glass-card text-slate-700 hover:border-blue-500/40'
+                ? 'bg-blue-600 text-white shadow'
+                : 'glass-card text-slate-700 hover:border-slate-300'
             }`}
           >
             Agile Sprint Planning
@@ -79,7 +79,7 @@ export const UseCaseShowcase: React.FC = () => {
         </div>
 
         {/* Bento Display Card inspired by makemynotes */}
-        <div className="group relative glass-card p-8 sm:p-10 text-left shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto border border-slate-200/80 rounded-3xl overflow-hidden hover:shadow-blue-500/10 transition-all duration-300">
+        <div className="group relative glass-card p-8 sm:p-10 text-left grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
           {/* Watermark Step Number from makemynotes */}
           <div className="absolute -right-4 -top-8 text-[12rem] font-black text-slate-900/[0.03] select-none pointer-events-none leading-none font-heading">
             {current.number}
