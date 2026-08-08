@@ -56,7 +56,7 @@ export const ScrollButtons: React.FC = () => {
         >
           <button
             onClick={scrollToTop}
-            className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-blue-600 transition-colors focus:outline-none"
+            className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-orange-500 transition-colors focus:outline-none"
             aria-label="Back to top"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -74,7 +74,7 @@ export const ScrollButtons: React.FC = () => {
         >
           <button
             onClick={scrollToBottom}
-            className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-blue-700 transition-colors focus:outline-none"
+            className="w-12 h-12 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-orange-600 transition-colors focus:outline-none"
             aria-label="Scroll to bottom"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

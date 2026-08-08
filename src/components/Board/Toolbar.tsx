@@ -7,6 +7,9 @@ import {
   Highlighter,
   Square,
   Circle as CircleIcon,
+  Diamond as DiamondIcon,
+  Triangle as TriangleIcon,
+  Star as StarIcon,
   Minus,
   MoveRight,
   Type,
@@ -61,6 +64,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     { id: 'highlighter', label: 'Highlighter', icon: <Highlighter className="w-4 h-4" /> },
     { id: 'rectangle', label: 'Rectangle', icon: <Square className="w-4 h-4" /> },
     { id: 'circle', label: 'Circle', icon: <CircleIcon className="w-4 h-4" /> },
+    { id: 'diamond', label: 'Diamond', icon: <DiamondIcon className="w-4 h-4" /> },
+    { id: 'triangle', label: 'Triangle', icon: <TriangleIcon className="w-4 h-4" /> },
+    { id: 'star', label: 'Star', icon: <StarIcon className="w-4 h-4" /> },
     { id: 'line', label: 'Straight Line', icon: <Minus className="w-4 h-4" /> },
     { id: 'arrow', label: 'Vector Arrow', icon: <MoveRight className="w-4 h-4" /> },
     { id: 'text', label: 'Text Box', icon: <Type className="w-4 h-4" /> },
@@ -116,16 +122,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
               title={tool.label}
-              className={`p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center relative ${
+              className={`p-2 rounded-xl transition-all duration-200 flex items-center justify-center relative ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-105'
+                  ? 'bg-blue-600 text-white shadow-md scale-105'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               {tool.icon}
-              {isActive && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-400 rounded-full animate-ping" />
-              )}
             </button>
           );
         })}
@@ -136,7 +139,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           onClick={onUndo}
           disabled={!canUndo}
           title="Undo"
-          className="p-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
         >
           <Undo2 className="w-4 h-4" />
         </button>
@@ -145,7 +148,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           onClick={onRedo}
           disabled={!canRedo}
           title="Redo"
-          className="p-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
         >
           <Redo2 className="w-4 h-4" />
         </button>
@@ -153,7 +156,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button
           onClick={onClear}
           title="Clear Board"
-          className="p-2.5 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50 transition"
+          className="p-2 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50 transition"
         >
           <Trash2 className="w-4 h-4" />
         </button>

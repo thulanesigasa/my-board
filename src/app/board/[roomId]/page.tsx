@@ -19,7 +19,7 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
   const [shapes, setShapes] = useState<BaseShape[]>([]);
   const [presences, setPresences] = useState<UserPresence[]>([]);
   const [activeTool, setActiveTool] = useState<ToolType>('pencil');
-  const [strokeColor, setStrokeColor] = useState('#6366F1');
+  const [strokeColor, setStrokeColor] = useState('#F97316');
   const [fillColor, setFillColor] = useState('transparent');
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [roomTitle, setRoomTitle] = useState('Untitled Board');
@@ -201,7 +201,7 @@ export default function BoardPage({ params }: { params: Promise<{ roomId: string
   };
 
   return (
-    <main className="w-full h-screen relative overflow-hidden bg-slate-950">
+    <main className="w-full h-screen relative overflow-hidden bg-white">
       <Header
         roomId={roomId}
         roomTitle={roomTitle}
